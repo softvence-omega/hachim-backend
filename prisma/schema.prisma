@@ -20,10 +20,15 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-   payment  Payment?
+   
   comments        Comment[]
   likes           Like[]
   reply           Reply[]
+
+  payment  Payment?
+  moodTrack          MoodTrack?
+  sleepTrack         SleepTrack?
+  motivationTrack    MotivationTrack?
 }
 
 
@@ -75,3 +80,24 @@ model Reply {
 
 
 
+
+model MoodTrack {
+  id       String  @id @default(uuid())
+  value    Int     // Changed `Number` to `Int`, since Prisma does not support `Number` type
+  userId   String  @unique
+  user     User    @relation(fields: [userId], references: [id])
+}
+
+model SleepTrack {
+  id       String  @id @default(uuid())
+  hours    Float
+  userId   String  @unique
+  user     User    @relation(fields: [userId], references: [id])
+}
+
+model MotivationTrack {
+  id       String  @id @default(uuid())
+  motivation   String
+  userId   String  @unique
+  user     User    @relation(fields: [userId], references: [id])
+}
