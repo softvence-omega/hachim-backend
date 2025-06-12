@@ -5,11 +5,12 @@ import { PrismaModule } from './prisma/prisma.module';
 import { AuthModule } from './module/auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
 import { QuizModule } from './module/quiz/quiz.module';
+import { CommentModule } from './module/comment/comment.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
-    PrismaModule,AuthModule, QuizModule],
+    PrismaModule,AuthModule, QuizModule, CommentModule],
   controllers: [AppController],
   providers: [AppService],
 })
