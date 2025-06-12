@@ -10,7 +10,8 @@ export class AuthService {
 constructor(private prisma:PrismaService){}
 
 hashData(data:string){
-    return bcrypt.hash(data,process.env.SOLT_ROUND as string)
+     const saltRounds = parseInt(process.env.SALT_ROUND as string)
+    return bcrypt.hash(data,saltRounds)
 }
 
 async register(dto:RegisterDto){
