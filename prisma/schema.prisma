@@ -24,6 +24,7 @@ model User {
   comments        Comment[]
   likes           Like[]
   reply           Reply[]
+  relapse  Relapse[]
 
   payment  Payment?
   moodTrack          MoodTrack?
@@ -54,6 +55,7 @@ model Comment {
   user      User      @relation(fields: [userId], references: [id])
   likes      Like[]
   reply      Reply[]
+  
 }
 
 model Like {
@@ -86,6 +88,9 @@ model MoodTrack {
   value    Int     // Changed `Number` to `Int`, since Prisma does not support `Number` type
   userId   String  @unique
   user     User    @relation(fields: [userId], references: [id])
+
+  relapseId  String @unique
+  relapse    Relapse  @relation(fields: [relapseId], references: [id])
 }
 
 model SleepTrack {
@@ -93,6 +98,9 @@ model SleepTrack {
   hours    Float
   userId   String  @unique
   user     User    @relation(fields: [userId], references: [id])
+
+  relapseId  String @unique
+  relapse    Relapse  @relation(fields: [relapseId], references: [id])
 }
 
 model MotivationTrack {
@@ -100,4 +108,27 @@ model MotivationTrack {
   motivation   String
   userId   String  @unique
   user     User    @relation(fields: [userId], references: [id])
+
+  relapseId  String @unique
+  relapse    Relapse  @relation(fields: [relapseId], references: [id])
+}
+
+model Relapse{
+   id       String  @id @default(uuid())
+   startTime DateTime
+   Mood Int
+   urg Int
+   Triggers String
+   note String
+   spendDate DateTime
+   level Int
+  isDeleted Boolean
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+   userId    String
+  user      User      @relation(fields: [userId], references: [id])
+
+  moodTracks        MoodTrack?
+  sleepTracks       SleepTrack?
+  motivationTracks  MotivationTrack?
 }
