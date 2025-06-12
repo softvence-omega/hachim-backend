@@ -5,6 +5,7 @@ export class RegisterDto {
 @IsNotEmpty()
 userName:string
 
+@IsNotEmpty()
 @IsEmail()
 email:string
 
