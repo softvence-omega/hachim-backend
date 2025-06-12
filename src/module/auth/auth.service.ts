@@ -1,4 +1,4 @@
-import { BadRequestException, ForbiddenException, Injectable } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import * as bcrypt from "bcrypt"
 import { RegisterDto } from './dto/register.dto';
@@ -48,6 +48,8 @@ if (existingUser) {
     return {newUser,...tokens}
 }
 
+
+//login
 async signIn(dto:LoginDto){
     const user= await this.prisma.user.findUnique({
         where:{
@@ -68,6 +70,33 @@ async signIn(dto:LoginDto){
    console.log(tokens);
    return tokens
 }
+
+
+
+//refresh token
+async refreshTokens(token:string){
+    try {
+        if(!token){
+      throw new UnauthorizedException('Invalid refresh token')  
+        }
+        const payload = await this.jwtService.verifyAsync(token,{
+            secret:process.env.REFRESH_TOKEN_SECRET
+        });
+        const user = await this.prisma.user.findUnique({
+            where:{
+                email:payload.email
+            }
+        })
+     if(!user){
+       throw new UnauthorizedException('Invalid refresh token')  
+     }   
+   return this.getTokens(user?.id,user?.email)
+    } catch (error) {
+        throw new UnauthorizedException('Invalid refresh token')
+    }
+}
+
+
 
 // utilities 
 async getTokens(userId:string,email:string){
