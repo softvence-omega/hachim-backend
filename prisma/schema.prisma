@@ -113,6 +113,9 @@ model MotivationTrack {
   relapse    Relapse  @relation(fields: [relapseId], references: [id])
 }
 
+
+
+
 model Relapse{
    id       String  @id @default(uuid())
    startTime DateTime

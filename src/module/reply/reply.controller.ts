@@ -1,5 +1,15 @@
-import { Controller, Post, Body, Get, Param } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  Get,
+  Param,
+  Res,
+  HttpStatus,
+} from '@nestjs/common';
 import { ReplyService } from './reply.service';
+import { Response } from 'express';
+import sendResponse from '../utils/sendResponse';
 
 
 @Controller('replies')
@@ -7,14 +17,32 @@ export class ReplyController {
   constructor(private readonly replyService: ReplyService) {}
 
   @Post()
-  createReply(
+  async createReply(
     @Body() data: { content: string; commentId: string; userId: string },
+    @Res() res: Response,
   ) {
-    return this.replyService.createReply(data);
+    const result = await this.replyService.createReply(data);
+
+    return sendResponse(res, {
+      statusCode: HttpStatus.CREATED,
+      success: true,
+      message: 'Reply created successfully',
+      data: result,
+    });
   }
 
   @Get('comment/:commentId')
-  getRepliesByComment(@Param('commentId') commentId: string) {
-    return this.replyService.getRepliesByComment(commentId);
+  async getRepliesByComment(
+    @Param('commentId') commentId: string,
+    @Res() res: Response,
+  ) {
+    const result = await this.replyService.getRepliesByComment(commentId);
+
+    return sendResponse(res, {
+      statusCode: HttpStatus.OK,
+      success: true,
+      message: 'Replies fetched successfully',
+      data: result,
+    });
   }
 }

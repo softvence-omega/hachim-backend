@@ -5,13 +5,13 @@ const prisma = new PrismaClient();
 
 @Injectable()
 export class SleepTrackService {
-  async createSleep(data: { hours: number; userId: string }) {
-    return prisma.sleepTrack.upsert({
-      where: { userId: data.userId },
-      update: { hours: data.hours },
-      create: { hours: data.hours, userId: data.userId },
-    });
-  }
+  async createSleep(data: { hours: number; userId: string; relapseId: string }) {
+  return prisma.sleepTrack.upsert({
+    where: { userId: data.userId },
+    update: { hours: data.hours },
+    create: { hours: data.hours, userId: data.userId, relapseId: data.relapseId },
+  });
+}
 
   async getSleepByUser(userId: string) {
     return prisma.sleepTrack.findUnique({ where: { userId } });
