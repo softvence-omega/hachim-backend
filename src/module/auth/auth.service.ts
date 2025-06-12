@@ -12,4 +12,7 @@ hashData(data:string){
     return bcrypt.hash(data,process.env.SOLT_ROUND as string)
 }
 
+
+
+
 }
