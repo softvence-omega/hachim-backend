@@ -99,6 +99,8 @@ export class PaymentService {
     const data = event.data.object as Stripe.PaymentIntent;
     const metadata = data.metadata;
      console.log(metadata, "not success but hite")
+     console.log(event.type);
+     
      if (event.type === 'payment_intent.succeeded') {
       console.log("successful")
       const transactionId = data.id;
