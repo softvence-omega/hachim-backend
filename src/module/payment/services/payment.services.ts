@@ -97,7 +97,7 @@ export class PaymentService {
 
     const data = event.data.object as Stripe.PaymentIntent;
     const metadata = data.metadata;
-    console.log(data)
+    
      if (event.type === 'payment_intent.succeeded') {
       const transactionId = data.id;
       const amount = data.amount_received / 100; 
@@ -113,6 +113,16 @@ export class PaymentService {
             },
           },
         });
+
+        await this.prisma.user.updateMany({
+  where: {
+    id: userId,
+  },
+  data: {
+    status: "PAID", // or any status you want to update to
+  },
+});
+
       } catch (error) {
         console.error('Error saving payment:', error);
         throw new BadRequestException('Failed to save payment');
