@@ -23,10 +23,14 @@ model User {
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
 
-  comments Comment[]
-  likes    Like[]
-  reply    Reply[]
-  relapse  Relapse[]
+
+
+   
+  comments        Comment[]
+  likes           Like[]
+  reply           Reply[]
+  relapse  Relapse?
+
 
   payment         Payment?
   moodTrack       MoodTrack?
@@ -84,8 +88,7 @@ model MoodTrack {
   userId String @unique
   user   User   @relation(fields: [userId], references: [id])
 
-  relapseId String  @unique
-  relapse   Relapse @relation(fields: [relapseId], references: [id])
+
 }
 
 model SleepTrack {
@@ -94,8 +97,7 @@ model SleepTrack {
   userId String @unique
   user   User   @relation(fields: [userId], references: [id])
 
-  relapseId String  @unique
-  relapse   Relapse @relation(fields: [relapseId], references: [id])
+
 }
 
 model MotivationTrack {
@@ -104,8 +106,6 @@ model MotivationTrack {
   userId     String @unique
   user       User   @relation(fields: [userId], references: [id])
 
-  relapseId String  @unique
-  relapse   Relapse @relation(fields: [relapseId], references: [id])
 }
 
 model Relapse {
@@ -139,4 +139,21 @@ model Journal {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+model Relapse {
+  id         String   @id @default(uuid())
+  startTime  DateTime @default(now())
+  Mood       Int?     
+  urg        Int?    
+  Triggers   String?  
+  note       String?  
+  spendDate  DateTime? 
+  level      Int?     
+  isDeleted  Boolean  
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  userId     String   @unique
+  user       User     @relation(fields: [userId], references: [id])
+
 }

@@ -6,6 +6,7 @@ import {
   Param,
   Res,
   HttpStatus,
+  Req,
 } from '@nestjs/common';
 import { SleepTrackService } from './sleep-track.service';
 import { Response } from 'express';
@@ -17,10 +18,11 @@ export class SleepTrackController {
 
   @Post()
   async createSleep(
-    @Body() data: { hours: number; userId: string; relapseId: string },
+    @Body() data: { hours: number; },
     @Res() res: Response,
+    @Req() req,
   ) {
-    const result = await this.sleepTrackService.createSleep(data);
+    const result = await this.sleepTrackService.createSleep(data,req.user.sub);
 
     return sendResponse(res, {
       statusCode: HttpStatus.CREATED,
@@ -30,12 +32,12 @@ export class SleepTrackController {
     });
   }
 
-  @Get(':userId')
+  @Get()
   async getSleepByUser(
-    @Param('userId') userId: string,
+    @Req() req,
     @Res() res: Response,
   ) {
-    const result = await this.sleepTrackService.getSleepByUser(userId);
+    const result = await this.sleepTrackService.getSleepByUser(req.user.sub);
 
     return sendResponse(res, {
       statusCode: HttpStatus.OK,

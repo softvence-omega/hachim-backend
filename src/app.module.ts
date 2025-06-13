@@ -9,14 +9,20 @@ import { QuizModule } from './module/quiz/quiz.module';
 import { CommentModule } from './module/comment/comment.module';
 import { PaymentModule } from './module/payment/payment.module';
 import { JournalModule } from './module/journal/journal.module';
+import { MotivationTrackModule } from './module/motivationTrack/motivation-track.module';
+import { SleepTrackModule } from './module/sleep-track/sleep-track.module';
+import { MoodTrackModule } from './module/mood-track/mood-track.module';
+import { RelapseModule } from './module/relapse/relapse.module';
+
 
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
     PrismaModule,AuthModule, QuizModule, CommentModule,UserModule,
-    PaymentModule,
-    JournalModule
+
+    PaymentModule,MotivationTrackModule,SleepTrackModule,MoodTrackModule,RelapseModule,JournalModule
+
   ],
   controllers: [AppController],
   providers: [AppService],
