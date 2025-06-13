@@ -13,6 +13,7 @@ import { Request } from 'express';
 import { CreatePaymentDto } from '../dto/payment.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 
+@Injectable()
 export class PaymentService {
   private stripe: Stripe;
 
@@ -32,7 +33,7 @@ export class PaymentService {
 
     const {amount } = dto;
 
-    
+   console.log(userId)
    const user = await this.prisma.user.findUnique({
     where: {id: userId},
   });
@@ -63,7 +64,7 @@ export class PaymentService {
       cancel_url: process.env.CLIENT_URL_CANCEL,
       payment_intent_data: {
         metadata: {
-           
+           userId
         },
       },
     });
