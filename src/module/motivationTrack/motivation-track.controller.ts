@@ -6,6 +6,7 @@ import {
   Param,
   Res,
   HttpStatus,
+  Req,
 } from '@nestjs/common';
 import { MotivationTrackService } from './motivation-track.service';
 import { Response } from 'express';
@@ -19,11 +20,12 @@ export class MotivationTrackController {
 
 @Post()
   async createMotivation(
-    @Body() data: { motivation: string; userId: string; relapseId: string },
+    @Body() data: { motivation: string;},
     @Res() res: Response,
+    @Req() req
   ) {
     
-      const result = await this.motivationTrackService.createMotivation(data);
+      const result = await this.motivationTrackService.createMotivation(data, req.user.sub);
 
       return sendResponse(res, {
         statusCode: HttpStatus.CREATED,
@@ -33,13 +35,13 @@ export class MotivationTrackController {
       });
     
   }
-  @Get(':userId')
+  @Get()
   async getMotivationByUser(
-    @Param('userId') userId: string,
+    @Req() req,
     @Res() res: Response,
   ) {
     const result = await this.motivationTrackService.getMotivationByUser(
-      userId,
+      req.user.sub
     );
 
     return sendResponse(res, {

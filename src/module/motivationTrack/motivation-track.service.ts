@@ -5,14 +5,14 @@ const prisma = new PrismaClient();
 
 @Injectable()
 export class MotivationTrackService {
- async createMotivation(data: { motivation: string; userId: string; relapseId: string }) {
+ async createMotivation(data: { motivation: string; },userId: string) {
   const existing = await prisma.motivationTrack.findUnique({
-    where: { userId: data.userId }, // or consider a compound unique if needed
+    where: { userId }, // or consider a compound unique if needed
   });
 
   if (existing) {
     return prisma.motivationTrack.update({
-      where: { userId: data.userId },
+      where: { userId },
       data: { motivation: data.motivation },
     });
   }
@@ -20,8 +20,8 @@ export class MotivationTrackService {
   return prisma.motivationTrack.create({
     data: {
       motivation: data.motivation,
-      userId: data.userId,
-      relapseId: data.relapseId,
+      userId
+      
     },
   });
 }
