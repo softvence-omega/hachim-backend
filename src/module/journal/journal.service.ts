@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { BadRequestException, Injectable } from "@nestjs/common";
 import { PrismaService } from "src/prisma/prisma.service";
 import { CreateJournalDto } from "./dto/create-journal.dto";
 import { UpdateJournalDto } from "./dto/update-journal.dto";
@@ -52,20 +52,38 @@ export class JournalService {
   }
 
   async update(id: string, userId: string, dto: UpdateJournalDto) {
+    const isJournalExist = await this.prisma.journal.findUnique({
+      where:{
+        id
+      }
+    })
+
+ if(!isJournalExist) {
+  throw new BadRequestException("the journal is not exist!")
+ }
+
     const data: any = {};
     if (dto.note !== undefined) data.note = dto.note;
     if (dto.mode !== undefined) data.mode = dto.mode;
     if (dto.urge !== undefined) data.urge = dto.urge;
     if (dto.date !== undefined) data.date = new Date(dto.date);
 
-    return this.prisma.journal.updateMany({
+    return this.prisma.journal.update({
       where: { id, userId },
       data,
     });
   }
 
   async delete(id: string, userId: string) {
-    return this.prisma.journal.deleteMany({
+ const isJournalExist = await this.prisma.journal.findUnique({
+      where:{
+        id
+      }
+    })
+ if(!isJournalExist) {
+  throw new BadRequestException("the journal is not exist!")
+ }
+    return this.prisma.journal.delete({
       where: { id, userId },
     });
   }
