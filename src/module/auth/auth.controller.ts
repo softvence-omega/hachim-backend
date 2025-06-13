@@ -34,7 +34,7 @@ export class AuthController {
       data,
     });
    }
-
+    
     @Post('login')
    async login(@Body() dto:LoginDto,@Res() res){
      const data =await this.authService.signIn(dto)
