@@ -5,6 +5,7 @@ import {
   Delete,
   Res,
   HttpStatus,
+  Req,
 } from '@nestjs/common';
 import { LikeService } from './like.service';
 import { Response } from 'express';
@@ -17,10 +18,11 @@ export class LikeController {
 
   @Post()
   async likeComment(
-    @Body() data: { commentId: string; userId: string },
+    @Body() data: { commentId: string; },
     @Res() res: Response,
+    @Req() req
   ) {
-    const result = await this.likeService.likeComment(data);
+    const result = await this.likeService.likeComment(data,req.user.sub);
 
     return sendResponse(res, {
       statusCode: HttpStatus.CREATED,
@@ -32,10 +34,11 @@ export class LikeController {
 
   @Delete()
   async unlikeComment(
-    @Body() data: { commentId: string; userId: string },
+    @Body() data: { commentId: string; },
     @Res() res: Response,
+    @Req() req
   ) {
-    const result = await this.likeService.unlikeComment(data);
+    const result = await this.likeService.unlikeComment(data,req.user.sub);
 
     return sendResponse(res, {
       statusCode: HttpStatus.OK,
