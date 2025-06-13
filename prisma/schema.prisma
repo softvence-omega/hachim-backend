@@ -1,4 +1,3 @@
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -8,129 +7,135 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum UserStatus {
+  PAID
+  UNPAID
+}
 
 model User {
-  id        String      @id @default(uuid())
-  userName  String      @unique
-  name      String?  
-  age       Int? 
-  email     String   @unique
+  id        String     @id @default(uuid())
+  userName  String     @unique
+  name      String?
+  age       Int?
+  status    UserStatus @default(UNPAID)
+  email     String     @unique
   password  String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+
 
    
   comments        Comment[]
   likes           Like[]
   reply           Reply[]
-  relapse  Relapse[]
+  relapse  Relapse?
 
-  payment  Payment?
-  moodTrack          MoodTrack?
-  sleepTrack         SleepTrack?
-  motivationTrack    MotivationTrack?
+
+  payment         Payment?
+  moodTrack       MoodTrack?
+  sleepTrack      SleepTrack?
+  motivationTrack MotivationTrack?
+  Journal         Journal[]
 }
 
-
-
 model Payment {
-  id         String   @id @default(uuid())
-  amount     Float
+  id            String   @id @default(uuid())
+  amount        Float
   transactionId String   @unique
   userId        String   @unique
   user          User     @relation(fields: [userId], references: [id])
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 }
 
-
 model Comment {
-  id        String    @id @default(uuid())
+  id        String   @id @default(uuid())
   content   String
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  postId    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
   userId    String
-  user      User      @relation(fields: [userId], references: [id])
-  likes      Like[]
-  reply      Reply[]
-  
+  user      User     @relation(fields: [userId], references: [id])
+  likes     Like[]
+  reply     Reply[]
 }
 
 model Like {
-  id         String    @id @default(uuid())
-  userId     String
-  commentId  String
-  createdAt  DateTime  @default(now())
-  user       User      @relation(fields: [userId], references: [id])
-  comment    Comment   @relation(fields: [commentId], references: [id])
+  id        String   @id @default(uuid())
+  userId    String
+  commentId String
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id])
+  comment   Comment  @relation(fields: [commentId], references: [id])
 
-  @@unique([userId,commentId]) 
+  @@unique([userId, commentId])
 }
 
 model Reply {
-  id        String    @id @default(uuid())
+  id        String   @id @default(uuid())
   content   String
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  commentId   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  commentId String
   userId    String
-  user      User      @relation(fields: [userId], references: [id])
-  comment    Comment   @relation(fields: [commentId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
+  comment   Comment  @relation(fields: [commentId], references: [id])
 }
 
-
-
-
 model MoodTrack {
-  id       String  @id @default(uuid())
-  value    Int     // Changed `Number` to `Int`, since Prisma does not support `Number` type
-  userId   String  @unique
-  user     User    @relation(fields: [userId], references: [id])
+  id     String @id @default(uuid())
+  value  Int // Changed `Number` to `Int`, since Prisma does not support `Number` type
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id])
 
-  relapseId  String @unique
-  relapse    Relapse  @relation(fields: [relapseId], references: [id])
+
 }
 
 model SleepTrack {
-  id       String  @id @default(uuid())
-  hours    Float
-  userId   String  @unique
-  user     User    @relation(fields: [userId], references: [id])
+  id     String @id @default(uuid())
+  hours  Float
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id])
 
-  relapseId  String @unique
-  relapse    Relapse  @relation(fields: [relapseId], references: [id])
+
 }
 
 model MotivationTrack {
-  id       String  @id @default(uuid())
-  motivation   String
-  userId   String  @unique
-  user     User    @relation(fields: [userId], references: [id])
+  id         String @id @default(uuid())
+  motivation String
+  userId     String @unique
+  user       User   @relation(fields: [userId], references: [id])
 
-  relapseId  String @unique
-  relapse    Relapse  @relation(fields: [relapseId], references: [id])
 }
 
 
 
+model Journal {
+  id     String   @id @default(uuid())
+  note   String
+  date   DateTime @default(now())
+  mode   Int
+  urge   Int
+  userId String
+  user   User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-model Relapse{
-   id       String  @id @default(uuid())
-   startTime DateTime
-   Mood Int
-   urg Int
-   Triggers String
-   note String
-   spendDate DateTime
-   level Int
-  isDeleted Boolean
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+model Relapse {
+  id         String   @id @default(uuid())
+  startTime  DateTime @default(now())
+  Mood       Int?     
+  urg        Int?    
+  Triggers   String?  
+  note       String?  
+  spendDate  DateTime? 
+  level      Int?     
+  isDeleted  Boolean  
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
-   userId    String
-  user      User      @relation(fields: [userId], references: [id])
 
-  moodTracks        MoodTrack?
-  sleepTracks       SleepTrack?
-  motivationTracks  MotivationTrack?
+  userId     String   @unique
+  user       User     @relation(fields: [userId], references: [id])
+
 }

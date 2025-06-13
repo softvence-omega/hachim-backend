@@ -6,6 +6,7 @@ import {
   Param,
   Res,
   HttpStatus,
+  Req,
 } from '@nestjs/common';
 import { ReplyService } from './reply.service';
 import { Response } from 'express';
@@ -18,10 +19,11 @@ export class ReplyController {
 
   @Post()
   async createReply(
-    @Body() data: { content: string; commentId: string; userId: string },
+    @Body() data: { content: string; commentId: string; },
     @Res() res: Response,
+    @Req() req
   ) {
-    const result = await this.replyService.createReply(data);
+    const result = await this.replyService.createReply(data ,req.user.sub);
 
     return sendResponse(res, {
       statusCode: HttpStatus.CREATED,

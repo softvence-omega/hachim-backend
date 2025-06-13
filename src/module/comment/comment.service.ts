@@ -5,24 +5,43 @@ const prisma = new PrismaClient();
 
 @Injectable()
 export class CommentService {
-  async createComment(data: {
-    content: string;
-    postId: string;
-    userId: string;
-  }) {
+  async createComment(data: { content: string }, userId: string) {
     return prisma.comment.create({
-      data,
+      data: {
+        ...data,
+        userId,
+      },
     });
   }
 
   async getCommentsByPost(postId: string) {
     return prisma.comment.findMany({
-      where: { postId },
+      where: { id: postId }, // Consider changing to where: { postId }
       include: {
         user: { select: { id: true, userName: true } },
         likes: true,
         reply: {
+          include: {
+            user: { select: { userName: true } },
+          },
+        },
+      },
+    });
+  }
+
+  async getAllComments(limit: number) {
+    return prisma.comment.findMany({
+      take: limit,
+      orderBy: {
+        createdAt: 'desc',
+      },
+      include: {
+        user: { select: { id: true, userName: true } },
+        reply: {
           include: { user: { select: { userName: true } } },
+        },
+        _count: {
+          select: { likes: true },
         },
       },
     });

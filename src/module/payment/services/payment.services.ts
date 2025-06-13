@@ -13,6 +13,7 @@ import { Request } from 'express';
 import { CreatePaymentDto } from '../dto/payment.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 
+@Injectable()
 export class PaymentService {
   private stripe: Stripe;
 
@@ -32,7 +33,7 @@ export class PaymentService {
 
     const {amount } = dto;
 
-    
+   console.log(userId)
    const user = await this.prisma.user.findUnique({
     where: {id: userId},
   });
@@ -63,13 +64,14 @@ export class PaymentService {
       cancel_url: process.env.CLIENT_URL_CANCEL,
       payment_intent_data: {
         metadata: {
-           
+           userId
         },
       },
     });
 
     if (!session?.url)
       throw new BadRequestException('Stripe session creation failed');
+    console.log("send url")
     return { url: session.url };
   }
 
@@ -82,7 +84,7 @@ export class PaymentService {
     if (!rawBody) {
       throw new BadRequestException('No webhook payload was provided.');
     }
-    
+     console.log("before stripe checked")
     try {
       event = this.stripe.webhooks.constructEvent(
         rawBody,
@@ -96,8 +98,11 @@ export class PaymentService {
 
     const data = event.data.object as Stripe.PaymentIntent;
     const metadata = data.metadata;
-    console.log(data)
+     console.log(metadata, "not success but hite")
+     console.log(event.type);
+     
      if (event.type === 'payment_intent.succeeded') {
+      console.log("successful")
       const transactionId = data.id;
       const amount = data.amount_received / 100; 
       const userId = metadata.userId; 
@@ -112,6 +117,16 @@ export class PaymentService {
             },
           },
         });
+
+        await this.prisma.user.updateMany({
+  where: {
+    id: userId,
+  },
+  data: {
+    status: "PAID", // or any status you want to update to
+  },
+});
+
       } catch (error) {
         console.error('Error saving payment:', error);
         throw new BadRequestException('Failed to save payment');
