@@ -3,12 +3,14 @@ import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import sendResponse from '../utils/sendResponse';
+import { Public } from 'src/common/decorators/public.decorators';
 
 @Controller('auth')
 export class AuthController {
 
     constructor(private authService:AuthService){}
 
+    @Public()
     @Post('register')
    async register(@Body() dto:RegisterDto, @Res() res){
     const data=await this.authService.register(dto)
@@ -20,6 +22,20 @@ export class AuthController {
     });
     }
 
+
+   @Public()
+    @Post('login')
+   async login(@Body() dto:LoginDto,@Res() res){
+     const data =await this.authService.signIn(dto)
+     return sendResponse(res, {
+      statusCode: HttpStatus.OK,
+      success: true,
+      message: 'User login successfully',
+      data,
+    });
+    }
+
+  @Public()
    @Post('refresh-token')
   async refreshToken(@Body('refreshToken') refreshToken:string, @Res() res){
      if (!refreshToken) {
@@ -34,18 +50,5 @@ export class AuthController {
       data,
     });
    }
-    
-    @Post('login')
-   async login(@Body() dto:LoginDto,@Res() res){
-     const data =await this.authService.signIn(dto)
-     return sendResponse(res, {
-      statusCode: HttpStatus.OK,
-      success: true,
-      message: 'User login successfully',
-      data,
-    });
-    }
-
-
 
 }
