@@ -1,28 +1,35 @@
-import { IsString, IsDateString, IsInt, IsBoolean, IsOptional } from 'class-validator';
+// src/modules/relapse/dto/relapse.create.dto.ts
+
+import { IsString, IsOptional, IsInt, IsDateString, IsBoolean } from 'class-validator';
 
 export class CreateRelapseDto {
+  
+
+  @IsOptional()
+  @IsInt()
+  Mood?: number;
+
+  @IsOptional()
+  @IsInt()
+  urg?: number;
+
+  @IsOptional()
+  @IsString()
+  Triggers?: string;
+
+  @IsOptional()
+  @IsString()
+  note?: string;
+
+  @IsOptional()
   @IsDateString()
-  startTime: Date;
+  spendDate?: string;
 
+  @IsOptional()
   @IsInt()
-  Mood: number;
+  level?: number;
 
-  @IsInt()
-  urg: number;
-
-  @IsString()
-  Triggers: string;
-
-  @IsString()
-  note: string;
-
-  @IsDateString()
-  spendDate: Date;
-
-  @IsInt()
-  level: number;
-
-  @IsString()
-  userId: string;
+  @IsOptional()
+  @IsBoolean()
+  isDeleted?: boolean; 
 }
-
