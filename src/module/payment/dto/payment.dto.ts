@@ -8,7 +8,4 @@ export class CreatePaymentDto {
   @IsNumber()
   amount:number;
 
- 
-  @IsEmail()
-  email: string;
 }

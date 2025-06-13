@@ -4,7 +4,11 @@ import { ValidationPipe } from '@nestjs/common';
 import { JwtGuard } from './common/guards/jwt.guard';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, {
+    rawBody: true,
+    bodyParser: true,
+  });
+   app.enableCors();
   const reflector = app.get(Reflector);
   app.useGlobalGuards(new JwtGuard(reflector));
     app.useGlobalPipes(

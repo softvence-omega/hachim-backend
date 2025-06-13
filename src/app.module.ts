@@ -7,12 +7,15 @@ import { ConfigModule } from '@nestjs/config';
 import { UserModule } from './module/user/user.module';
 import { QuizModule } from './module/quiz/quiz.module';
 import { CommentModule } from './module/comment/comment.module';
+import { PaymentModule } from './module/payment/payment.module';
 
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
-    PrismaModule,AuthModule, QuizModule, CommentModule,UserModule],
+    PrismaModule,AuthModule, QuizModule, CommentModule,UserModule,
+    PaymentModule
+  ],
   controllers: [AppController],
   providers: [AppService],
 })
