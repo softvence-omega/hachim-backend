@@ -12,7 +12,6 @@ import { CommentModule } from './module/comment/comment.module';
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
-
     PrismaModule,AuthModule, QuizModule, CommentModule,UserModule],
   controllers: [AppController],
   providers: [AppService],

@@ -4,8 +4,8 @@ import sendResponse from '../utils/sendResponse';
 
 @Controller('user')
 export class UserController {
-
 constructor(private userService:UserService){}
+
 
 @Get()
 async getAllUser(@Res() res){
