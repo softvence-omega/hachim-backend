@@ -1,13 +1,14 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Controller, Post, Body } from '@nestjs/common';
 import { QuizService } from './quiz.service';
-import { CalculateScoreDto } from './dto/ quiz.dto';
+import { Public } from 'src/common/decorators/public.decorators';
 
 @Controller('quiz')
 export class QuizController {
   constructor(private readonly quizService: QuizService) {}
-
-  @Post('calculate')
-  calculate(@Body() dto: CalculateScoreDto) {
-    return this.quizService.calculateScore(dto.totalPoints, dto.numberOfQuestions);
+  
+  @Public()
+  @Post('analyze')
+  analyze(@Body() body: { answers: { title: string; answer: string }[] }) {
+    return this.quizService.calculateScore(body.answers);
   }
 }
