@@ -37,11 +37,7 @@ export class RelapseService {
 
     // If marked as deleted, delete related mood/sleep/motion tracks
     if (dto.isDeleted) {
-      await Promise.all([
-        this.prisma.moodTrack.deleteMany({ where: { relapseId: dto.id } }),
-        this.prisma.sleepTrack.deleteMany({ where: { relapseId: dto.id } }),
-        this.prisma.motivationTrack.deleteMany({ where: { relapseId: dto.id } }),
-      ]);
+      
     }
 
     return updated;

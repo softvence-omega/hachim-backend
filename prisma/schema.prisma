@@ -93,8 +93,7 @@ model MoodTrack {
   userId   String  @unique
   user     User    @relation(fields: [userId], references: [id])
 
-  relapseId  String @unique
-  relapse    Relapse  @relation(fields: [relapseId], references: [id])
+  
 }
 
 model SleepTrack {
@@ -103,8 +102,7 @@ model SleepTrack {
   userId   String  @unique
   user     User    @relation(fields: [userId], references: [id])
 
-  relapseId  String @unique
-  relapse    Relapse  @relation(fields: [relapseId], references: [id])
+ 
 }
 
 model MotivationTrack {
@@ -113,8 +111,7 @@ model MotivationTrack {
   userId   String  @unique
   user     User    @relation(fields: [userId], references: [id])
 
-  relapseId  String @unique
-  relapse    Relapse  @relation(fields: [relapseId], references: [id])
+  
 }
 
 
@@ -135,7 +132,5 @@ model Relapse{
    userId    String
   user      User      @relation(fields: [userId], references: [id])
 
-  moodTracks        MoodTrack?
-  sleepTracks       SleepTrack?
-  motivationTracks  MotivationTrack?
+ 
 }

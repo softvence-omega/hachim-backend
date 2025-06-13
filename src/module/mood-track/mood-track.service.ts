@@ -5,11 +5,11 @@ const prisma = new PrismaClient();
 
 @Injectable()
 export class MoodTrackService {
-  async createMood(data: { value: number; userId: string; relapseId: string }) {
+  async createMood(data: { value: number; }, userId: string) {
   return prisma.moodTrack.upsert({
-    where: { userId: data.userId },
-    update: { value: data.value },
-    create: { value: data.value, userId: data.userId, relapseId: data.relapseId },
+    where: { userId},
+    update: { value: Number(data.value )},
+    create: { value: Number(data.value), userId, },
   });
 }
 
