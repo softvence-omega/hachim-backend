@@ -9,11 +9,17 @@ datasource db {
 }
 
 
+enum UserStatus {
+  PAID
+  UNPAID
+}
+
 model User {
   id        String      @id @default(uuid())
   userName  String      @unique
   name      String?  
   age       Int? 
+  status     UserStatus @default(UNPAID)
   email     String   @unique
   password  String
   createdAt DateTime @default(now())
