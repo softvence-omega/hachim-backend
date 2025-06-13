@@ -8,10 +8,13 @@ export class ReplyService {
   async createReply(data: {
     content: string;
     commentId: string;
-    userId: string;
-  }) {
+  },userId:string) {
     return prisma.reply.create({
-      data,
+      data:{
+        ...data,
+        userId
+
+      }
     });
   }
 

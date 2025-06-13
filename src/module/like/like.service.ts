@@ -5,10 +5,13 @@ const prisma = new PrismaClient();
 
 @Injectable()
 export class LikeService {
-  async likeComment(data: { commentId: string; userId: string }) {
+  async likeComment(data: { commentId: string; } ,userId: string) {
     try {
       return await prisma.like.create({
-        data: data,
+        data: {
+          ...data,
+          userId
+        }
       });
     } catch (err) {
       if (err.code === 'P2002') {
@@ -18,11 +21,11 @@ export class LikeService {
     }
   }
 
-  async unlikeComment(data: { commentId: string; userId: string }) {
+  async unlikeComment(data: { commentId: string;},  userId: string) {
     return prisma.like.delete({
       where: {
         userId_commentId: {
-          userId: data.userId,
+          userId,
           commentId: data.commentId,
         },
       },
