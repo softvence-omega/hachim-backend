@@ -71,6 +71,7 @@ export class PaymentService {
 
     if (!session?.url)
       throw new BadRequestException('Stripe session creation failed');
+    console.log("send url")
     return { url: session.url };
   }
 
@@ -83,7 +84,7 @@ export class PaymentService {
     if (!rawBody) {
       throw new BadRequestException('No webhook payload was provided.');
     }
-    
+     console.log("before stripe checked")
     try {
       event = this.stripe.webhooks.constructEvent(
         rawBody,
@@ -97,8 +98,9 @@ export class PaymentService {
 
     const data = event.data.object as Stripe.PaymentIntent;
     const metadata = data.metadata;
-    
+     console.log(metadata, "not success but hite")
      if (event.type === 'payment_intent.succeeded') {
+      console.log("successful")
       const transactionId = data.id;
       const amount = data.amount_received / 100; 
       const userId = metadata.userId; 
