@@ -14,7 +14,7 @@ enum UserStatus {
 
 model User {
   id        String     @id @default(uuid())
-  userName  String     @unique
+  userName  String?     @unique
   name      String?
   age       Int?
   status    UserStatus @default(UNPAID)
