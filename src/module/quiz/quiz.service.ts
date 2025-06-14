@@ -1,5 +1,6 @@
-import { Injectable } from '@nestjs/common';
-import { PrismaClient } from '@prisma/client';
+import { BadRequestException, Injectable } from '@nestjs/common';
+import { PrismaClient, UserStatus } from '@prisma/client';
+import { UserInfo } from 'os';
 const prisma = new PrismaClient();
 @Injectable()
 export class QuizService {
@@ -85,11 +86,13 @@ export class QuizService {
     },
   };
 
- async calculateScore(answers: { title: string; answer: string }[],userInfo:{name:string, age:number},userId:string) {
-     await prisma.user.update({
+  async calculateScore(answers: { title: string; answer: string }[],userinfo:{name:string,age:number},userId:string) {
+
+ 
+    await prisma.user.update({
     where: { id: userId },
     data: {
-      ...userInfo,
+      ...userinfo,
     },
   });
 
@@ -115,5 +118,34 @@ export class QuizService {
       averageScore: `${this.averageScore}%`,
       higherDependence: `${diffFromAvg}% higher dependence than average`,
     };
+  }
+
+  async goalsUpdate(userId:string,goals:string) {
+    const result = await prisma.user.update({
+    where: { id: userId },
+    data: {
+      goals,
+      status: UserStatus.COMPLETED
+    },
+  });
+  return result;
+  }
+
+  async create(dto:{mental: string;physical: string;social: string;faith: string;},userId:string) {
+    
+    const existing = await prisma.symptoms.findUnique({
+      where: { userId:userId },
+    });
+    
+    if (existing) {
+      throw new BadRequestException('Symptoms already exist for this user');
+    }
+    console.log('uuu')
+    return await prisma.symptoms.create({
+      data: {
+        ...dto,
+        userId
+      }
+    });
   }
 }

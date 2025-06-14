@@ -10,6 +10,7 @@ datasource db {
 enum UserStatus {
   PAID
   UNPAID
+  COMPLETED
 }
 
 model User {
@@ -22,6 +23,7 @@ model User {
   password  String
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
+  goals   String?
 
 
 
@@ -30,6 +32,7 @@ model User {
   likes           Like[]
   reply           Reply[]
   relapse  Relapse?
+  symptoms Symptoms?
 
 
   payment         Payment?
@@ -37,6 +40,21 @@ model User {
   sleepTrack      SleepTrack?
   motivationTrack MotivationTrack?
   Journal         Journal[]
+}
+
+
+model Symptoms {
+   id            String   @id @default(uuid())
+   mental String
+   physical String
+   social String
+   faith String
+   userId String @unique
+
+   user   User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 }
 
 model Payment {
