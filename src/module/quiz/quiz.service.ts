@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
-
+import { PrismaClient } from '@prisma/client';
+const prisma = new PrismaClient();
 @Injectable()
 export class QuizService {
   private readonly averageScore = 13;
@@ -84,7 +85,14 @@ export class QuizService {
     },
   };
 
-  calculateScore(answers: { title: string; answer: string }[]) {
+ async calculateScore(answers: { title: string; answer: string }[],userInfo:{name:string, age:number},userId:string) {
+     await prisma.user.update({
+    where: { id: userId },
+    data: {
+      ...userInfo,
+    },
+  });
+
     let totalPoints = 0;
     let maxPoints = 0;
 

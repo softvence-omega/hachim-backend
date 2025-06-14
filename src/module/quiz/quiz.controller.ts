@@ -1,6 +1,7 @@
-import { Controller, Post, Body } from '@nestjs/common';
+import { Controller, Post, Body, Req } from '@nestjs/common';
 import { QuizService } from './quiz.service';
 import { Public } from 'src/common/decorators/public.decorators';
+import { Request } from 'express';
 
 @Controller('quiz')
 export class QuizController {
@@ -8,7 +9,8 @@ export class QuizController {
   
   @Public()
   @Post('analyze')
-  analyze(@Body() body: { answers: { title: string; answer: string }[] }) {
-    return this.quizService.calculateScore(body.answers);
+  analyze(@Body() body: { answers: { title: string; answer: string }[],userinfo:{name:string,age:number} }, @Req() req) {
+  
+    return this.quizService.calculateScore(body.answers,body.userinfo,req.user.sub);
   }
 }
