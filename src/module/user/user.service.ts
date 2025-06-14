@@ -6,7 +6,12 @@ export class UserService {
 constructor( private prisma:PrismaService){}
 
 async getAllUser(){
-const result = await this.prisma.user.findMany();
+const result = await this.prisma.user.findMany({
+    select:{
+        password:false
+    }
+});
+
 return result;
 }
 
