@@ -107,9 +107,9 @@ async requestResetCode({ email }: RequestResetCodeDto) {
 
     const code = Math.floor(1000 + Math.random() * 9000).toString(); // 4-digit
     const expiresAt = new Date(Date.now() + 5 * 60 * 1000); // 5 minutes
-
+    const hashedCode = await bcrypt.hash(code, 10);
     await this.prisma.otpCode.create({
-      data: { email, code, expiresAt },
+      data: { email,code:hashedCode, expiresAt },
     });
 
     await this.mailerService.sendMail({
@@ -123,12 +123,15 @@ async requestResetCode({ email }: RequestResetCodeDto) {
 
   async verifyResetCode({ email, code }: VerifyResetCodeDto) {
     const record = await this.prisma.otpCode.findFirst({
-      where: { email, code, verified: false },
+      where: { email,verified: false },
       orderBy: { createdAt: 'desc' },
     });
+ if (!record) throw new BadRequestException('Invalid code');
+ if (record.expiresAt < new Date()) throw new BadRequestException('Code expired');
 
-    if (!record) throw new BadRequestException('Invalid code');
-    if (record.expiresAt < new Date()) throw new BadRequestException('Code expired');
+  const isMatch = await bcrypt.compare(code, record.code);
+  if (!isMatch) throw new BadRequestException('Invalid code');
+ 
 
     await this.prisma.otpCode.update({
       where: { id: record.id },
