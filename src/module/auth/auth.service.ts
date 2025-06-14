@@ -1,9 +1,11 @@
-import { BadRequestException, ForbiddenException, Injectable, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import * as bcrypt from "bcrypt"
 import { RegisterDto } from './dto/register.dto';
 import { JwtService } from '@nestjs/jwt';
 import { LoginDto } from './dto/login.dto';
+import { MailerService } from '@nestjs-modules/mailer';
+import { RequestResetCodeDto, ResetPasswordDto, VerifyResetCodeDto } from './dto/forget-reset-password.dto';
 
 
 @Injectable()
@@ -11,7 +13,8 @@ export class AuthService {
 
 constructor(
     private prisma:PrismaService,
-    private jwtService:JwtService
+    private jwtService:JwtService,
+    private mailerService: MailerService
 ){}
 
 
@@ -94,6 +97,79 @@ async refreshTokens(token:string){
         throw new UnauthorizedException('Invalid refresh token')
     }
 }
+
+
+
+
+async requestResetCode({ email }: RequestResetCodeDto) {
+    const user = await this.prisma.user.findUnique({ where: { email } });
+    if (!user) throw new NotFoundException('User not found');
+
+    const code = Math.floor(1000 + Math.random() * 9000).toString(); // 4-digit
+    const expiresAt = new Date(Date.now() + 5 * 60 * 1000); // 5 minutes
+
+    await this.prisma.otpCode.create({
+      data: { email, code, expiresAt },
+    });
+
+    await this.mailerService.sendMail({
+      to: email,
+      subject: 'Your password reset code',
+      text: `Your code is ${code}. It expires in 5 minutes.`,
+    });
+
+    return { message: 'OTP sent to your email' };
+  }
+
+  async verifyResetCode({ email, code }: VerifyResetCodeDto) {
+    const record = await this.prisma.otpCode.findFirst({
+      where: { email, code, verified: false },
+      orderBy: { createdAt: 'desc' },
+    });
+
+    if (!record) throw new BadRequestException('Invalid code');
+    if (record.expiresAt < new Date()) throw new BadRequestException('Code expired');
+
+    await this.prisma.otpCode.update({
+      where: { id: record.id },
+      data: { verified: true },
+    });
+
+    return { message: 'Code verified successfully' };
+  }
+
+
+
+
+  
+  async resetPassword({ email, password, confirmPassword }: ResetPasswordDto) {
+    if (password !== confirmPassword) {
+      throw new BadRequestException("Passwords don't match");
+    }
+
+    const verifiedOtp = await this.prisma.otpCode.findFirst({
+      where: { email, verified: true },
+      orderBy: { createdAt: 'desc' },
+    });
+
+    if (!verifiedOtp) {
+      throw new BadRequestException('No verified OTP found');
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    await this.prisma.user.update({
+      where: { email },
+      data: { password: hashedPassword },
+    });
+
+    await this.prisma.otpCode.deleteMany({ where: { email } }); 
+
+    return { message: 'Password reset successful' };
+  }
+
+
+
 
 
 

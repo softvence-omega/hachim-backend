@@ -139,3 +139,14 @@ model Relapse {
   user       User     @relation(fields: [userId], references: [id])
 
 }
+
+
+model OtpCode {
+  id        String   @id @default(uuid())
+  email     String
+  code      String
+  expiresAt DateTime
+  verified  Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
