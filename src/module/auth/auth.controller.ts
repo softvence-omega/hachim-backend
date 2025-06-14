@@ -4,6 +4,7 @@ import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import sendResponse from '../utils/sendResponse';
 import { Public } from 'src/common/decorators/public.decorators';
+import { RequestResetCodeDto, ResetPasswordDto, VerifyResetCodeDto } from './dto/forget-reset-password.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -50,5 +51,42 @@ export class AuthController {
       data,
     });
    }
+
+
+    @Public()
+  @Post('request-reset-code')
+  async requestResetCode(@Body() dto: RequestResetCodeDto, @Res() res) {
+    const data = await this.authService.requestResetCode(dto);
+    return sendResponse(res, {
+      statusCode: HttpStatus.OK,
+      success: true,
+      message: 'Reset code sent to email',
+      data,
+    });
+  }
+
+  @Public()
+  @Post('verify-reset-code')
+  async verifyResetCode(@Body() dto: VerifyResetCodeDto, @Res() res) {
+    const data = await this.authService.verifyResetCode(dto);
+    return sendResponse(res, {
+      statusCode: HttpStatus.OK,
+      success: true,
+      message: 'Code verified successfully',
+      data,
+    });
+  }
+
+  @Public()
+  @Post('reset-password')
+  async resetPassword(@Body() dto: ResetPasswordDto, @Res() res) {
+    const data = await this.authService.resetPassword(dto);
+    return sendResponse(res, {
+      statusCode: HttpStatus.OK,
+      success: true,
+      message: 'Password reset successfully',
+      data,
+    });
+  }
 
 }

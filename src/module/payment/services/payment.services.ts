@@ -6,6 +6,7 @@ import {
   InternalServerErrorException,
   RawBodyRequest,
   NotFoundException,
+  Logger,
 } from '@nestjs/common';
 import Stripe from 'stripe';
 
@@ -15,6 +16,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class PaymentService {
+  private readonly logger = new Logger(PaymentService.name)
   private stripe: Stripe;
 
   constructor(
@@ -33,14 +35,19 @@ export class PaymentService {
 
     const {amount } = dto;
 
-   console.log(userId)
-   const user = await this.prisma.user.findUnique({
-    where: {id: userId},
-  });
 
-  if (!user) {
-    throw new NotFoundException('User not found');
-  }
+const user = await this.prisma.user.findUnique({
+  where: { id: userId },
+  include: { payment: true },
+});
+
+if (!user) {
+  throw new NotFoundException('User not found');
+}
+
+if (user.payment) {
+  throw new BadRequestException('Cannot delete user with existing payment record');
+}
     
      
 
@@ -106,6 +113,8 @@ export class PaymentService {
       const transactionId = data.id;
       const amount = data.amount_received / 100; 
       const userId = metadata.userId; 
+
+      this.logger.warn("")
 
       try {
         await this.prisma.payment.create({

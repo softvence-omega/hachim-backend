@@ -13,11 +13,24 @@ import { MotivationTrackModule } from './module/motivationTrack/motivation-track
 import { SleepTrackModule } from './module/sleep-track/sleep-track.module';
 import { MoodTrackModule } from './module/mood-track/mood-track.module';
 import { RelapseModule } from './module/relapse/relapse.module';
+import { MailerModule } from '@nestjs-modules/mailer';
 
 
 
 @Module({
   imports: [
+     MailerModule.forRoot({
+      transport: {
+        service: 'gmail', 
+        auth: {
+          user: process.env.EMAIL_USER,
+          pass: process.env.EMAIL_PASS,
+        },
+      },
+      defaults: {
+        from:process.env.EMAIL_USER,
+      },
+    }),
     ConfigModule.forRoot({ isGlobal: true }),
     PrismaModule,AuthModule, QuizModule, CommentModule,UserModule,
 
