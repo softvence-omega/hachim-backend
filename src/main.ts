@@ -3,6 +3,7 @@ import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { JwtGuard } from './common/guards/jwt.guard';
 import { GlobalExceptionFilter } from './common/filters/global-exception.filter';
+import { RolesGuard } from './common/guards/roles.guard';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
@@ -12,7 +13,7 @@ async function bootstrap() {
    app.enableCors();
    app.useGlobalFilters(new GlobalExceptionFilter());
   const reflector = app.get(Reflector);
-  app.useGlobalGuards(new JwtGuard(reflector));
+  app.useGlobalGuards(new RolesGuard(reflector), new JwtGuard(reflector));
     app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true, 

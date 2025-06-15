@@ -5,6 +5,7 @@ import { LoginDto } from './dto/login.dto';
 import sendResponse from '../utils/sendResponse';
 import { Public } from 'src/common/decorators/public.decorators';
 import { RequestResetCodeDto, ResetPasswordDto, VerifyResetCodeDto } from './dto/forget-reset-password.dto';
+import { Response } from 'express';
 
 @Controller('auth')
 export class AuthController {
@@ -24,9 +25,23 @@ export class AuthController {
     }
 
 
+@Public()
+@Post('social-login')
+async socialLogin(@Body('email') email: string,@Res() res:Response) {
+  if(!email) throw new BadRequestException("email is required!")
+   const data =await this.authService.socialLogin(email)
+     return sendResponse(res, {
+      statusCode: HttpStatus.OK,
+      success: true,
+      message: 'User login successfully',
+      data,
+    });
+}
+ 
+
    @Public()
     @Post('login')
-   async login(@Body() dto:LoginDto,@Res() res){
+   async login(@Body() dto:LoginDto,@Res() res:Response){
      const data =await this.authService.signIn(dto)
      return sendResponse(res, {
       statusCode: HttpStatus.OK,
