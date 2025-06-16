@@ -14,6 +14,7 @@ import { SleepTrackModule } from './module/sleep-track/sleep-track.module';
 import { MoodTrackModule } from './module/mood-track/mood-track.module';
 import { RelapseModule } from './module/relapse/relapse.module';
 import { MailerModule } from '@nestjs-modules/mailer';
+import { SeederService } from './seeder/seeder.service';
 
 
 
@@ -38,7 +39,7 @@ import { MailerModule } from '@nestjs-modules/mailer';
 
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService,SeederService],
 })
 export class AppModule {}
 

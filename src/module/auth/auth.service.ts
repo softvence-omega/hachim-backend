@@ -6,6 +6,8 @@ import { JwtService } from '@nestjs/jwt';
 import { LoginDto } from './dto/login.dto';
 import { MailerService } from '@nestjs-modules/mailer';
 import { RequestResetCodeDto, ResetPasswordDto, VerifyResetCodeDto } from './dto/forget-reset-password.dto';
+import { ChangePasswordDto } from './dto/change-password.dto';
+
 
 
 @Injectable()
@@ -46,10 +48,42 @@ if (existingUser) {
         }
     })
 
-    const tokens=await this.getTokens(newUser.id,newUser.email);
+    const tokens=await this.getTokens(newUser.id,newUser.email,newUser.role);
 
     return {newUser,...tokens}
 }
+
+
+
+// socialLogin 
+async socialLogin(email: string) {
+  if (!email) {
+    throw new BadRequestException('Email is required');
+  }
+
+  let user = await this.prisma.user.findUnique({
+    where: { email },
+  });
+
+  // Create new user if not exists
+  if (!user) {
+    user = await this.prisma.user.create({
+      data: {
+        email
+      }
+    });
+  }
+
+  const tokens = await this.getTokens(user.id, user.email, user.role);
+
+  return {
+    message: 'Login successful',
+    user,
+    ...tokens,
+  };
+}
+
+
 
 
 //login
@@ -64,12 +98,12 @@ async signIn(dto:LoginDto){
         throw new ForbiddenException("Invalid Credentials")
     }
 
-    const passwordMatches = await bcrypt.compare(dto.password,user.password);
+    const passwordMatches = await bcrypt.compare(dto.password,user.password!);
     if(!passwordMatches){
       throw new ForbiddenException("Invalid Credentials")
     }
 
-   const tokens=await this.getTokens(user.id,user.email);
+   const tokens=await this.getTokens(user.id,user.email,user.role);
    return tokens
 }
 
@@ -92,14 +126,43 @@ async refreshTokens(token:string){
      if(!user){
        throw new UnauthorizedException('Invalid refresh token')  
      }   
-   return this.getTokens(user?.id,user?.email)
+   return this.getTokens(user?.id,user?.email,user.role)
     } catch (error) {
         throw new UnauthorizedException('Invalid refresh token')
     }
 }
 
+//change password 
+async changePassword(email: string, dto: ChangePasswordDto) {
+  const user = await this.prisma.user.findUnique({ where: { email } });
+
+  if (!user || !user.password) {
+    throw new NotFoundException('User not found or password not set');
+  }
+
+  const isMatch = await bcrypt.compare(dto.oldPassword, user.password);
+  if (!isMatch) {
+    throw new BadRequestException('Old password is incorrect');
+  }
+
+  if (dto.newPassword !== dto.confirmPassword) {
+    throw new BadRequestException("New password and confirm password don't match");
+  }
+
+  const hashedPassword = await bcrypt.hash(dto.newPassword, 10);
+
+  await this.prisma.user.update({
+    where: { email },
+    data: { password: hashedPassword },
+  });
+
+  return { email };
+}
 
 
+
+
+// forget and reset password 
 
 async requestResetCode({ email }: RequestResetCodeDto) {
     const user = await this.prisma.user.findUnique({ where: { email } });
@@ -177,12 +240,13 @@ async requestResetCode({ email }: RequestResetCodeDto) {
 
 
 // utilities 
-async getTokens(userId:string,email:string){
+async getTokens(userId:string,email:string,role:string){
     const [at,rt]= await Promise.all([
         this.jwtService.signAsync(
             {
                 sub:userId,
-                email
+                email,
+                role
             },
             {
              secret:process.env.ACCESS_TOKEN_SECRET,
@@ -192,7 +256,8 @@ async getTokens(userId:string,email:string){
         this.jwtService.signAsync(
             {
                 sub:userId,
-                email
+                email,
+                role
             },
             {
              secret:process.env.REFRESH_TOKEN_SECRET,
