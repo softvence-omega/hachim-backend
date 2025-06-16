@@ -5,23 +5,26 @@ const prisma = new PrismaClient();
 
 @Injectable()
 export class LikeService {
-  async likeComment(data: { commentId: string; } ,userId: string) {
+  async likeComment(data: { commentId: string }, userId: string) {
     try {
       return await prisma.like.create({
         data: {
           ...data,
-          userId
-        }
+          userId,
+        },
       });
     } catch (err) {
       if (err.code === 'P2002') {
-        throw new HttpException('You have already liked this comment.', HttpStatus.BAD_REQUEST);
+        throw new HttpException(
+          'You have already liked this comment.',
+          HttpStatus.BAD_REQUEST,
+        );
       }
       throw err;
     }
   }
 
-  async unlikeComment(data: { commentId: string;},  userId: string) {
+  async unlikeComment(data: { commentId: string }, userId: string) {
     return prisma.like.delete({
       where: {
         userId_commentId: {

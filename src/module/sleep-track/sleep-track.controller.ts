@@ -18,11 +18,11 @@ export class SleepTrackController {
 
   @Post()
   async createSleep(
-    @Body() data: { hours: number; },
+    @Body() data: { hours: number },
     @Res() res: Response,
     @Req() req,
   ) {
-    const result = await this.sleepTrackService.createSleep(data,req.user.sub);
+    const result = await this.sleepTrackService.createSleep(data, req.user.sub);
 
     return sendResponse(res, {
       statusCode: HttpStatus.CREATED,
@@ -33,10 +33,7 @@ export class SleepTrackController {
   }
 
   @Get()
-  async getSleepByUser(
-    @Req() req,
-    @Res() res: Response,
-  ) {
+  async getSleepByUser(@Req() req, @Res() res: Response) {
     const result = await this.sleepTrackService.getSleepByUser(req.user.sub);
 
     return sendResponse(res, {

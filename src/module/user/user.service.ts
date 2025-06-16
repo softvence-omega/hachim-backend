@@ -3,13 +3,12 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { Role } from '@prisma/client';
 import { CreateAdminDto } from './dto/create-admin.dto';
-import * as bcrypt from "bcrypt"
+import * as bcrypt from 'bcrypt';
 @Injectable()
 export class UserService {
-constructor( private prisma:PrismaService){}
+  constructor(private prisma: PrismaService) {}
 
-
-async createAdmin(dto: CreateAdminDto) {
+  async createAdmin(dto: CreateAdminDto) {
     const existing = await this.prisma.user.findUnique({
       where: { email: dto.email },
     });
@@ -22,7 +21,7 @@ async createAdmin(dto: CreateAdminDto) {
       data: {
         email: dto.email,
         password: hashedPassword,
-        role: Role.ADMIN
+        role: Role.ADMIN,
       },
     });
 
@@ -33,25 +32,22 @@ async createAdmin(dto: CreateAdminDto) {
     };
   }
 
-async getAllUser(){
-const result = await this.prisma.user.findMany();
-return result;
-}
+  async getAllUser() {
+    const result = await this.prisma.user.findMany();
+    return result;
+  }
 
-
-async updateUser(email:string,dto:UpdateUserDto){
+  async updateUser(email: string, dto: UpdateUserDto) {
     const result = await this.prisma.user.update({
-        where:{
-         email
-        },
-        data:{
-        name:dto.name,
-        age: dto.age
-    }
-    })
+      where: {
+        email,
+      },
+      data: {
+        name: dto.name,
+        age: dto.age,
+      },
+    });
 
-    return result
-}
-
-
+    return result;
+  }
 }

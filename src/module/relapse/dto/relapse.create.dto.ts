@@ -1,11 +1,16 @@
 // src/modules/relapse/dto/relapse.create.dto.ts
 
 import { Type } from 'class-transformer';
-import { IsString, IsOptional, IsInt, IsDateString, IsBoolean, IsDate } from 'class-validator';
+import {
+  IsString,
+  IsOptional,
+  IsInt,
+  IsDateString,
+  IsBoolean,
+  IsDate,
+} from 'class-validator';
 
 export class CreateRelapseDto {
-  
-
   @IsOptional()
   @IsInt()
   Mood?: number;
@@ -36,5 +41,5 @@ export class CreateRelapseDto {
 
   @IsOptional()
   @IsBoolean()
-  isDeleted?: boolean; 
+  isDeleted?: boolean;
 }
