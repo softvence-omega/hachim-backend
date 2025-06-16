@@ -1,11 +1,12 @@
-import { BadRequestException, Body, Controller, HttpStatus, Post, Res } from '@nestjs/common';
+import { BadRequestException, Body, Controller, HttpStatus, Patch, Post, Req, Res } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import sendResponse from '../utils/sendResponse';
 import { Public } from 'src/common/decorators/public.decorators';
 import { RequestResetCodeDto, ResetPasswordDto, VerifyResetCodeDto } from './dto/forget-reset-password.dto';
-import { Response } from 'express';
+import { Request, Response } from 'express';
+import { ChangePasswordDto } from './dto/change-password.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -14,7 +15,7 @@ export class AuthController {
 
     @Public()
     @Post('register')
-   async register(@Body() dto:RegisterDto, @Res() res){
+   async register(@Body() dto:RegisterDto, @Res() res:Response){
     const data=await this.authService.register(dto)
     return sendResponse(res, {
       statusCode: HttpStatus.CREATED,
@@ -53,7 +54,7 @@ async socialLogin(@Body('email') email: string,@Res() res:Response) {
 
   @Public()
    @Post('refresh-token')
-  async refreshToken(@Body('refreshToken') refreshToken:string, @Res() res){
+  async refreshToken(@Body('refreshToken') refreshToken:string, @Res() res:Response){
      if (!refreshToken) {
     throw new BadRequestException('Refresh token is required');
   }
@@ -68,9 +69,30 @@ async socialLogin(@Body('email') email: string,@Res() res:Response) {
    }
 
 
-    @Public()
+
+
+@Patch('change-password')
+async changePassword(
+  @Body() dto: ChangePasswordDto,
+  @Req() req: Request,
+  @Res() res: Response,
+) {
+  const email = req.user?.email
+
+  const data = await this.authService.changePassword(email!, dto);
+
+  return sendResponse(res, {
+    statusCode: HttpStatus.OK,
+    success: true,
+    message: 'Password changed successfully',
+    data,
+  });
+}
+
+// forget and reset password related api's 
+  @Public()
   @Post('request-reset-code')
-  async requestResetCode(@Body() dto: RequestResetCodeDto, @Res() res) {
+  async requestResetCode(@Body() dto: RequestResetCodeDto, @Res() res:Response) {
     const data = await this.authService.requestResetCode(dto);
     return sendResponse(res, {
       statusCode: HttpStatus.OK,
@@ -82,7 +104,7 @@ async socialLogin(@Body('email') email: string,@Res() res:Response) {
 
   @Public()
   @Post('verify-reset-code')
-  async verifyResetCode(@Body() dto: VerifyResetCodeDto, @Res() res) {
+  async verifyResetCode(@Body() dto: VerifyResetCodeDto, @Res() res:Response) {
     const data = await this.authService.verifyResetCode(dto);
     return sendResponse(res, {
       statusCode: HttpStatus.OK,
@@ -94,7 +116,7 @@ async socialLogin(@Body('email') email: string,@Res() res:Response) {
 
   @Public()
   @Post('reset-password')
-  async resetPassword(@Body() dto: ResetPasswordDto, @Res() res) {
+  async resetPassword(@Body() dto: ResetPasswordDto, @Res() res:Response) {
     const data = await this.authService.resetPassword(dto);
     return sendResponse(res, {
       statusCode: HttpStatus.OK,

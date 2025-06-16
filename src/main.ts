@@ -13,7 +13,7 @@ async function bootstrap() {
    app.enableCors();
    app.useGlobalFilters(new GlobalExceptionFilter());
   const reflector = app.get(Reflector);
-  app.useGlobalGuards(new RolesGuard(reflector), new JwtGuard(reflector));
+  app.useGlobalGuards(new JwtGuard(reflector),new RolesGuard(reflector));
     app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true, 

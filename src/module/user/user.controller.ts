@@ -6,8 +6,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { Roles } from 'src/common/decorators/roles.decorator';
 import { Role } from '@prisma/client';
 import { CreateAdminDto } from './dto/create-admin.dto';
-import { JwtGuard } from 'src/common/guards/jwt.guard';
-import { RolesGuard } from 'src/common/guards/roles.guard';
+
 
 @Controller('user')
 export class UserController {
