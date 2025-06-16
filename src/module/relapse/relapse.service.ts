@@ -7,23 +7,29 @@ import { CreateRelapseDto } from './dto/relapse.create.dto';
 export class RelapseService {
   constructor(private prisma: PrismaService) {}
 
-  async createOrUpdateRelapse(dto: CreateRelapseDto,userId:string) {
-    const relapse = await this.prisma.relapse.upsert({
-      where: {
-        userId
-      },
-      update: {
-        ...dto,
-        updatedAt: new Date(),
-      },
-      create: {
-        ...dto,
-        isDeleted: false,
-        userId
-      },
-    });
-    return relapse;
-  }
+ async createOrUpdateRelapse(newdto: CreateRelapseDto, userId: string) {
+  const { startDate, ...dto } = newdto;
+
+  const relapse = await this.prisma.relapse.upsert({
+    where: { userId },
+    update: {
+      ...dto,
+      updatedAt: new Date(),
+    },
+    create: {
+      ...dto,
+      isDeleted: false,
+      userId,
+    },
+  });
+
+  const timeDifferent = relapse.createdAt.getTime() - new Date(startDate).getTime();
+
+  return {
+    timeDifferent,
+    relapse,
+  };
+}
 
   async resetOptionalFields(userId: string) {
     
