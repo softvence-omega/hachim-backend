@@ -5,16 +5,18 @@ const prisma = new PrismaClient();
 
 @Injectable()
 export class ReplyService {
-  async createReply(data: {
-    content: string;
-    commentId: string;
-  },userId:string) {
+  async createReply(
+    data: {
+      content: string;
+      commentId: string;
+    },
+    userId: string,
+  ) {
     return prisma.reply.create({
-      data:{
+      data: {
         ...data,
-        userId
-
-      }
+        userId,
+      },
     });
   }
 

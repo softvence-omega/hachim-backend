@@ -1,4 +1,13 @@
-import { Body, Controller, Get, HttpStatus, Patch, Post, Req, Res, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpStatus,
+  Patch,
+  Post,
+  Req,
+  Res,
+} from '@nestjs/common';
 import { UserService } from './user.service';
 import sendResponse from '../utils/sendResponse';
 import { Request, Response } from 'express';
@@ -7,18 +16,13 @@ import { Roles } from 'src/common/decorators/roles.decorator';
 import { Role } from '@prisma/client';
 import { CreateAdminDto } from './dto/create-admin.dto';
 
-
 @Controller('user')
 export class UserController {
-constructor(private userService:UserService){}
+  constructor(private userService: UserService) {}
 
-
-@Post('admin/create')
+  @Post('admin/create')
   @Roles(Role.ADMIN)
-  async createAdmin(
-    @Body() dto: CreateAdminDto,
-    @Res() res: Response,
-  ) {
+  async createAdmin(@Body() dto: CreateAdminDto, @Res() res: Response) {
     const data = await this.userService.createAdmin(dto);
     return sendResponse(res, {
       statusCode: HttpStatus.CREATED,
@@ -28,30 +32,31 @@ constructor(private userService:UserService){}
     });
   }
 
-@Get()
-@Roles(Role.ADMIN)
-async getAllUser(@Res() res:Response){
-    const data= await this.userService.getAllUser()
-    return sendResponse(res,
-     {
+  @Get()
+  @Roles(Role.ADMIN)
+  async getAllUser(@Res() res: Response) {
+    const data = await this.userService.getAllUser();
+    return sendResponse(res, {
       statusCode: HttpStatus.OK,
       success: true,
       message: 'Retrive all users successfully',
       data,
     });
-}
+  }
 
-
-@Patch('update')
-async updateUser(@Body() dto:UpdateUserDto,@Req() req:Request,@Res() res:Response){
-  const email = req.user?.email
-  const data= await this.userService.updateUser(email!,dto)
+  @Patch('update')
+  async updateUser(
+    @Body() dto: UpdateUserDto,
+    @Req() req: Request,
+    @Res() res: Response,
+  ) {
+    const email = req.user?.email;
+    const data = await this.userService.updateUser(email!, dto);
     return sendResponse(res, {
       statusCode: HttpStatus.OK,
       success: true,
       message: 'Update user successfully',
       data,
     });
-}
-
+  }
 }

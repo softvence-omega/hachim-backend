@@ -18,30 +18,28 @@ export class MotivationTrackController {
     private readonly motivationTrackService: MotivationTrackService,
   ) {}
 
-@Post()
+  @Post()
   async createMotivation(
-    @Body() data: { motivation: string;},
+    @Body() data: { motivation: string },
     @Res() res: Response,
-    @Req() req
+    @Req() req,
   ) {
-    
-      const result = await this.motivationTrackService.createMotivation(data, req.user.sub);
+    const result = await this.motivationTrackService.createMotivation(
+      data,
+      req.user.sub,
+    );
 
-      return sendResponse(res, {
-        statusCode: HttpStatus.CREATED,
-        success: true,
-        message: 'Motivation recorded successfully',
-        data: result,
-      });
-    
+    return sendResponse(res, {
+      statusCode: HttpStatus.CREATED,
+      success: true,
+      message: 'Motivation recorded successfully',
+      data: result,
+    });
   }
   @Get()
-  async getMotivationByUser(
-    @Req() req,
-    @Res() res: Response,
-  ) {
+  async getMotivationByUser(@Req() req, @Res() res: Response) {
     const result = await this.motivationTrackService.getMotivationByUser(
-      req.user.sub
+      req.user.sub,
     );
 
     return sendResponse(res, {

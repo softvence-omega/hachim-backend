@@ -6,7 +6,6 @@ import { CommentService } from './comment.service';
 import { LikeService } from '../like/like.service';
 import { ReplyService } from '../reply/reply.service';
 
-
 @Module({
   controllers: [CommentController, LikeController, ReplyController],
   providers: [CommentService, LikeService, ReplyService],
