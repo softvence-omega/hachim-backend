@@ -48,7 +48,7 @@ export class QuoteService {
 
 
 async findAll() {
-  return this.prisma.quote.findMany();
+  return this.prisma.quote.findMany({take:10});
 }
 
 async findOne(id: string) {
