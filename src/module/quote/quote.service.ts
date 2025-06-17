@@ -19,8 +19,12 @@ export class QuoteService {
     let imageUrl = dto.imageUrl;
     let publicId: string | undefined;
     if (file) {
+    const fileExt = file.originalname.split('.').pop()
+    const fileName =file.originalname.split('.')[0]
+    const originalFileName = `${fileName}-${Date.now()}.${fileExt}`; 
       const uploadRes = await this.cloudinary.uploader.upload(file.path, {
         folder: 'quotes',
+        public_id: originalFileName, 
       });
       imageUrl = uploadRes.secure_url;
       publicId = uploadRes.public_id;
@@ -63,11 +67,13 @@ async update(id: string, dto: UpdateQuoteDto, file?: Express.Multer.File) {
     // Delete previous image from Cloudinary
     if (publicId) {
       await this.cloudinary.uploader.destroy(publicId);
-    }
-
-    // Upload new image
+      }
+      const fileExt = file.originalname.split('.').pop()
+    const fileName =file.originalname.split('.')[0]
+    const originalFileName = `${fileName}-${Date.now()}.${fileExt}`;
     const uploadRes = await this.cloudinary.uploader.upload(file.path, {
       folder: 'quotes',
+      public_id:originalFileName
     });
     imageUrl = uploadRes.secure_url;
     publicId = uploadRes.public_id;
