@@ -17,6 +17,8 @@ import { MailerModule } from '@nestjs-modules/mailer';
 import { SeederService } from './seeder/seeder.service';
 import { ArticleModule } from './module/article/article.module';
 import { QuoteModule } from './module/quote/quote.module';
+import { sub } from 'date-fns';
+import { SubscriptionModule } from './module/subscription/subscription.module';
 
 @Module({
   imports: [
@@ -47,6 +49,7 @@ import { QuoteModule } from './module/quote/quote.module';
     JournalModule,
     ArticleModule,
     QuoteModule,
+    SubscriptionModule,
   ],
   controllers: [AppController],
   providers: [AppService, SeederService],
