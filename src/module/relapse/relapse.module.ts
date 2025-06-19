@@ -7,6 +7,5 @@ import { MoodTrackService } from '../mood-track/mood-track.service';
 @Module({
   controllers: [RelapseController],
   providers: [RelapseService, PrismaService],
-  
 })
 export class RelapseModule {}
