@@ -36,7 +36,7 @@ export class CreateRelapseDto {
   level?: number;
 
   @IsDate()
-  @Type(() => Date) // 👈 This line ensures the plain string is transformed into a Date object
+  @Type(() => Date) 
   startDate: Date;
 
   @IsOptional()
