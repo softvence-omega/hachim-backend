@@ -23,27 +23,17 @@ export class PaymentService {
     this.stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string);
   }
 
-  async createPayment(dto: CreatePaymentDto, userId: string) {
-    const {durationDays, amount } = dto;
+  async createPayment(dto: CreatePaymentDto) {
+    const {durationDays, amount ,email } = dto;
 
-    const user = await this.prisma.user.findUnique({
-      where: { id: userId },
-      include: { payment: true },
-    });
+  
 
-    if (!user) {
-      throw new NotFoundException('User not found');
-    }
-
-    if (user.payment) {
-      throw new BadRequestException(
-        'Cannot delete user with existing payment record',
-      );
-    }
+    
+    
 
     const session = await this.stripe.checkout.sessions.create({
       payment_method_types: ['card'],
-      customer_email: user.email,
+      customer_email: email,
       line_items: [
         {
           price_data: {
@@ -61,7 +51,7 @@ export class PaymentService {
       cancel_url: process.env.CLIENT_URL_CANCEL,
       payment_intent_data: {
         metadata: {
-          userId,
+          email,
           durationDays
         },
       },
@@ -102,7 +92,7 @@ export class PaymentService {
       console.log('successful');
       const transactionId = data.id;
       const amount = data.amount_received / 100;
-      const userId = metadata.userId;
+      const email = metadata.email;
 
       this.logger.warn('');
 
@@ -112,20 +102,12 @@ export class PaymentService {
             transactionId,
             amount,
             durationDays: parseInt(metadata.durationDays),
-            user: {
-              connect: { id: userId },
-            },
+            email
+            
           },
         });
 
-        await this.prisma.user.updateMany({
-          where: {
-            id: userId,
-          },
-          data: {
-            status: 'PAID', // or any status you want to update to
-          },
-        });
+        
       } catch (error) {
         console.error('Error saving payment:', error);
         throw new BadRequestException('Failed to save payment');
