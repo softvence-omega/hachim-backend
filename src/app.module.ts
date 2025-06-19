@@ -16,6 +16,8 @@ import { RelapseModule } from './module/relapse/relapse.module';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { SeederService } from './seeder/seeder.service';
 import { ArticleModule } from './module/article/article.module';
+import { QuoteModule } from './module/quote/quote.module';
+import { VideoModule } from './module/video/video.module';
 
 @Module({
   imports: [
@@ -45,6 +47,8 @@ import { ArticleModule } from './module/article/article.module';
     RelapseModule,
     JournalModule,
     ArticleModule,
+    QuoteModule,
+    VideoModule,
   ],
   controllers: [AppController],
   providers: [AppService, SeederService],

@@ -182,3 +182,23 @@ model Article {
   updatedAt   DateTime @updatedAt
 }
 
+model Quote {
+  id        String   @id @default(uuid())
+  name      String
+  quote     String
+  imageUrl  String?
+  cloudinaryPublicId String? 
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Video {
+  id                 String   @id @default(uuid())
+  title              String
+  videoUrl           String?
+  cloudinaryPublicId String?
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+}
+
+
