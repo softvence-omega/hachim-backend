@@ -20,6 +20,8 @@ import { QuoteModule } from './module/quote/quote.module';
 import { sub } from 'date-fns';
 import { SubscriptionModule } from './module/subscription/subscription.module';
 import { RecoveryModule } from './module/recovery/recovery.modulet';
+import { VideoModule } from './module/video/video.module';
+
 
 @Module({
   imports: [
@@ -50,8 +52,10 @@ import { RecoveryModule } from './module/recovery/recovery.modulet';
     JournalModule,
     ArticleModule,
     QuoteModule,
+    recovery
     SubscriptionModule,
     RecoveryModule,
+    VideoModule,
   ],
   controllers: [AppController],
   providers: [AppService, SeederService],

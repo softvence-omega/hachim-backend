@@ -137,4 +137,51 @@ export class PaymentService {
 
     return { received: true, type: event.type };
   }
+
+
+ async getAllPayments(query: { page?: number; limit?: number; amount?: string }) {
+  const { page = 1, limit = 10, amount } = query;
+
+  const skip = (page - 1) * limit;
+  const take = limit;
+
+  const whereClause = amount
+    ? {
+        amount: {
+          equals: parseFloat(amount), 
+        },
+      }
+    : {};
+
+  const [payments, total] = await this.prisma.$transaction([
+    this.prisma.payment.findMany({
+      where: whereClause,
+      include: {
+        user: true,
+      },
+      skip,
+      take,
+      orderBy: {
+        createdAt: 'desc',
+      },
+    }),
+    this.prisma.payment.count({ where: whereClause }),
+  ]);
+
+  return {
+    statusCode: 200,
+    success: true,
+    message: 'Payments fetched successfully',
+    meta: {
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit),
+    },
+    data: payments,
+  };
+}
+
+
+
 }

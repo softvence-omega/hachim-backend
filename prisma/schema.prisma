@@ -196,6 +196,7 @@ model Quote {
 }
 
 
+
 // prisma/schema.prisma
 
 model UserRecovery {
@@ -228,6 +229,16 @@ model Subscription {
 
 
 
+
+
+model Video {
+  id                 String   @id @default(uuid())
+  title              String
+  videoUrl           String?
+  cloudinaryPublicId String?
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+}
 
 
 
