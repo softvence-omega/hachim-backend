@@ -11,10 +11,15 @@ import {
 import { SleepTrackService } from './sleep-track.service';
 import { Response } from 'express';
 import sendResponse from '../utils/sendResponse';
+import { RecoveryService } from '../recovery/services/recovery.services';
 
 @Controller('sleep-track')
 export class SleepTrackController {
-  constructor(private readonly sleepTrackService: SleepTrackService) {}
+  constructor(
+    private readonly sleepTrackService: SleepTrackService,
+    private readonly recovery: RecoveryService
+
+  ) {}
 
   @Post()
   async createSleep(
@@ -23,7 +28,7 @@ export class SleepTrackController {
     @Req() req,
   ) {
     const result = await this.sleepTrackService.createSleep(data, req.user.sub);
-
+        await this.recovery.updateRecovery(req.user.sub, {sleepScore:data.hours});
     return sendResponse(res, {
       statusCode: HttpStatus.CREATED,
       success: true,

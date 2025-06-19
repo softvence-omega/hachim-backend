@@ -12,9 +12,13 @@ import { RelapseService } from './relapse.service';
 import sendResponse from '../utils/sendResponse';
 import { CreateRelapseDto } from './dto/relapse.create.dto';
 import { UpdateRelapseDto } from './dto/relapse.update.dto';
+import { RecoveryService } from '../recovery/services/recovery.services';
 @Controller('relapse')
 export class RelapseController {
-  constructor(private readonly relapseService: RelapseService) {}
+  constructor(
+    private readonly relapseService: RelapseService,
+    private readonly recovery: RecoveryService
+  ) {}
 
   @Post()
   async createRelapse(
@@ -26,6 +30,9 @@ export class RelapseController {
       dto,
       req.user.sub,
     );
+     const timeDifferentInDays: number = Math.floor(data.timeDifferent / (1000 * 60 * 60 * 24));
+     await this.recovery.updateRecovery(req.user.sub, { streakDays: timeDifferentInDays });
+    
     return sendResponse(res, {
       statusCode: HttpStatus.CREATED,
       success: true,

@@ -24,7 +24,7 @@ export class PaymentService {
   }
 
   async createPayment(dto: CreatePaymentDto, userId: string) {
-    const { amount } = dto;
+    const {durationDays, amount } = dto;
 
     const user = await this.prisma.user.findUnique({
       where: { id: userId },
@@ -62,6 +62,7 @@ export class PaymentService {
       payment_intent_data: {
         metadata: {
           userId,
+          durationDays
         },
       },
     });
@@ -110,6 +111,7 @@ export class PaymentService {
           data: {
             transactionId,
             amount,
+            durationDays: parseInt(metadata.durationDays),
             user: {
               connect: { id: userId },
             },
