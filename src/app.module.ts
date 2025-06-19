@@ -52,7 +52,7 @@ import { VideoModule } from './module/video/video.module';
     JournalModule,
     ArticleModule,
     QuoteModule,
-    recovery
+    RecoveryModule,
     SubscriptionModule,
     RecoveryModule,
     VideoModule,

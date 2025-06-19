@@ -28,6 +28,16 @@ export class AuthService {
 
   //register
   async register(dto: RegisterDto) {
+    const isPaid = await this.prisma.payment.findUnique({
+      where:{
+        email:dto.email
+      }
+    })
+
+    if(!isPaid){
+      throw new BadRequestException('Please pay first')
+    }
+
     const existingUser = await this.prisma.user.findFirst({
       where: {
         OR: [{ userName: dto.userName }, { email: dto.email }],
@@ -49,6 +59,8 @@ export class AuthService {
         userName: dto.userName,
         email: dto.email,
         password: hashPassword,
+        
+        
       },
     });
 
@@ -76,6 +88,7 @@ export class AuthService {
       user = await this.prisma.user.create({
         data: {
           email,
+
         },
       });
     }

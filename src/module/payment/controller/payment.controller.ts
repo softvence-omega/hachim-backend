@@ -24,13 +24,15 @@ import { Public } from 'src/common/decorators/public.decorators';
 export class PaymentController {
   constructor(private readonly paymentService: PaymentService) {}
 
+
+  @Public()
   @Post('/')
   async create(
     @Body() dto: CreatePaymentDto,
     @Res() res: Response,
     @Req() req,
   ) {
-    const data = await this.paymentService.createPayment(dto, req.user.sub);
+    const data = await this.paymentService.createPayment(dto);
     return sendResponse(res, {
       statusCode: HttpStatus.CREATED,
       success: true,
@@ -38,6 +40,8 @@ export class PaymentController {
       data,
     });
   }
+
+
   @Public()
   @Post('/webhook')
   async webhook(
@@ -47,14 +51,7 @@ export class PaymentController {
     return this.paymentService.handleWebhook(req);
   }
 
-  @Get()
-  async getAllPayments(
-    @Query('page') page?: string,
-    @Query('limit') limit?: string,
-    @Query('amount') amount?: string,
-  ) {
-    const pageNumber = page ? parseInt(page, 10) : 1;
-    const limitNumber = limit ? parseInt(limit, 10) : 10;
+  
 
 
   @Get()

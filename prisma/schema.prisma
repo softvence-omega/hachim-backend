@@ -8,9 +8,9 @@ datasource db {
 }
 
 enum UserStatus {
-  PAID
-  UNPAID
   COMPLETED
+  UNCOMPLETED
+  
 }
 
 enum Role {
@@ -23,7 +23,7 @@ model User {
   userName  String?     @unique
   name      String?
   age       Int?
-  status    UserStatus @default(UNPAID)
+  status    UserStatus @default(UNCOMPLETED)
   email     String     @unique
   role      Role     @default(USER)
   password  String?
@@ -42,12 +42,14 @@ model User {
   recovery UserRecovery?
 
 
-  payment         Payment?
+ 
   moodTrack       MoodTrack?
   sleepTrack      SleepTrack?
   motivationTrack MotivationTrack?
   Journal         Journal[]
   subscriptions Subscription[]
+
+  payment    Payment? 
 }
 
 
@@ -70,8 +72,9 @@ model Payment {
   amount        Float
   transactionId String   @unique
   durationDays Int?
-  userId        String   @unique
-  user          User     @relation(fields: [userId], references: [id])
+  email        String         @unique
+  user       User?    @relation(fields: [userId], references: [id])
+  userId     String?   @unique
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 }
