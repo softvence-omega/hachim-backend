@@ -47,6 +47,15 @@ export class PaymentController {
     return this.paymentService.handleWebhook(req);
   }
 
+  @Get()
+  async getAllPayments(
+    @Query('page') page?: string,
+    @Query('limit') limit?: string,
+    @Query('amount') amount?: string,
+  ) {
+    const pageNumber = page ? parseInt(page, 10) : 1;
+    const limitNumber = limit ? parseInt(limit, 10) : 10;
+
 
   @Get()
   async getAllPayments(
@@ -56,6 +65,7 @@ export class PaymentController {
   ) {
     const pageNumber = page ? parseInt(page, 10) : 1;
     const limitNumber = limit ? parseInt(limit, 10) : 10;
+
 
     return this.paymentService.getAllPayments({
       page: pageNumber,
