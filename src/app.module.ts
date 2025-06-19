@@ -19,6 +19,7 @@ import { ArticleModule } from './module/article/article.module';
 import { QuoteModule } from './module/quote/quote.module';
 import { sub } from 'date-fns';
 import { SubscriptionModule } from './module/subscription/subscription.module';
+import { RecoveryModule } from './module/recovery/recovery.modulet';
 
 @Module({
   imports: [
@@ -50,6 +51,7 @@ import { SubscriptionModule } from './module/subscription/subscription.module';
     ArticleModule,
     QuoteModule,
     SubscriptionModule,
+    RecoveryModule,
   ],
   controllers: [AppController],
   providers: [AppService, SeederService],
