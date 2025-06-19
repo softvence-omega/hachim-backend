@@ -1,16 +1,38 @@
-import { Controller, Post, Body, Put, Res, HttpStatus, Req } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  Put,
+  Res,
+  HttpStatus,
+  Req,
+} from '@nestjs/common';
 import { Response } from 'express';
 import { RelapseService } from './relapse.service';
 import sendResponse from '../utils/sendResponse';
 import { CreateRelapseDto } from './dto/relapse.create.dto';
 import { UpdateRelapseDto } from './dto/relapse.update.dto';
+import { RecoveryService } from '../recovery/services/recovery.services';
 @Controller('relapse')
 export class RelapseController {
-  constructor(private readonly relapseService: RelapseService) {}
+  constructor(
+    private readonly relapseService: RelapseService,
+    private readonly recovery: RecoveryService
+  ) {}
 
   @Post()
-  async createRelapse(@Body() dto: CreateRelapseDto, @Res() res: Response, @Req() req) {
-    const data = await this.relapseService.createOrUpdateRelapse(dto,req.user.sub);
+  async createRelapse(
+    @Body() dto: CreateRelapseDto,
+    @Res() res: Response,
+    @Req() req,
+  ) {
+    const data = await this.relapseService.createOrUpdateRelapse(
+      dto,
+      req.user.sub,
+    );
+     const timeDifferentInDays: number = Math.floor(data.timeDifferent / (1000 * 60 * 60 * 24));
+     await this.recovery.updateRecovery(req.user.sub, { streakDays: timeDifferentInDays });
+    
     return sendResponse(res, {
       statusCode: HttpStatus.CREATED,
       success: true,
@@ -19,12 +41,8 @@ export class RelapseController {
     });
   }
 
-
   @Put('reset')
-  async resetOptionalFields(
-    @Req() req,
-    @Res() res: Response,
-  ) {
+  async resetOptionalFields(@Req() req, @Res() res: Response) {
     const result = await this.relapseService.resetOptionalFields(req.user.sub);
 
     return sendResponse(res, {
@@ -34,6 +52,4 @@ export class RelapseController {
       data: result,
     });
   }
-
-  
 }

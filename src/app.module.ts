@@ -15,32 +15,49 @@ import { MoodTrackModule } from './module/mood-track/mood-track.module';
 import { RelapseModule } from './module/relapse/relapse.module';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { SeederService } from './seeder/seeder.service';
-
+import { ArticleModule } from './module/article/article.module';
+import { QuoteModule } from './module/quote/quote.module';
+import { sub } from 'date-fns';
+import { SubscriptionModule } from './module/subscription/subscription.module';
+import { RecoveryModule } from './module/recovery/recovery.modulet';
+import { VideoModule } from './module/video/video.module';
 
 
 @Module({
   imports: [
-     MailerModule.forRoot({
+    MailerModule.forRoot({
       transport: {
-        service: 'gmail', 
+        service: 'gmail',
         auth: {
           user: process.env.EMAIL_USER,
           pass: process.env.EMAIL_PASS,
         },
       },
       defaults: {
-        from:process.env.EMAIL_USER,
+        from: process.env.EMAIL_USER,
       },
     }),
     ConfigModule.forRoot({ isGlobal: true }),
-    PrismaModule,AuthModule, QuizModule, CommentModule,UserModule,
+    PrismaModule,
+    AuthModule,
+    QuizModule,
+    CommentModule,
+    UserModule,
 
-    PaymentModule,MotivationTrackModule,SleepTrackModule,MoodTrackModule,RelapseModule,JournalModule
-
+    PaymentModule,
+    MotivationTrackModule,
+    SleepTrackModule,
+    MoodTrackModule,
+    RelapseModule,
+    JournalModule,
+    ArticleModule,
+    QuoteModule,
+    recovery
+    SubscriptionModule,
+    RecoveryModule,
+    VideoModule,
   ],
   controllers: [AppController],
-  providers: [AppService,SeederService],
+  providers: [AppService, SeederService],
 })
 export class AppModule {}
-
-

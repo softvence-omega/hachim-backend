@@ -32,7 +32,7 @@ export class SeederService implements OnApplicationBootstrap {
       data: {
         email: adminEmail,
         password: hashedPassword,
-        role: Role.ADMIN
+        role: Role.ADMIN,
       },
     });
 

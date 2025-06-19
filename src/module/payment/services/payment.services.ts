@@ -16,40 +16,30 @@ import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class PaymentService {
-  private readonly logger = new Logger(PaymentService.name)
+  private readonly logger = new Logger(PaymentService.name);
   private stripe: Stripe;
 
-  constructor(
-   
-    private prisma: PrismaService,
-    
-
-  ) {
-    this.stripe = new Stripe(
-      process.env.STRIPE_SECRET_KEY as string
-    );
+  constructor(private prisma: PrismaService) {
+    this.stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string);
   }
 
-  async createPayment(dto: CreatePaymentDto, userId:string) {
+  async createPayment(dto: CreatePaymentDto, userId: string) {
+    const {durationDays, amount } = dto;
 
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      include: { payment: true },
+    });
 
-    const {amount } = dto;
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
 
-
-const user = await this.prisma.user.findUnique({
-  where: { id: userId },
-  include: { payment: true },
-});
-
-if (!user) {
-  throw new NotFoundException('User not found');
-}
-
-if (user.payment) {
-  throw new BadRequestException('Cannot delete user with existing payment record');
-}
-    
-     
+    if (user.payment) {
+      throw new BadRequestException(
+        'Cannot delete user with existing payment record',
+      );
+    }
 
     const session = await this.stripe.checkout.sessions.create({
       payment_method_types: ['card'],
@@ -61,7 +51,7 @@ if (user.payment) {
             product_data: {
               name: 'Instant Payment',
             },
-            unit_amount: amount* 100,
+            unit_amount: amount * 100,
           },
           quantity: 1,
         },
@@ -71,14 +61,15 @@ if (user.payment) {
       cancel_url: process.env.CLIENT_URL_CANCEL,
       payment_intent_data: {
         metadata: {
-           userId
+          userId,
+          durationDays
         },
       },
     });
 
     if (!session?.url)
       throw new BadRequestException('Stripe session creation failed');
-    console.log("send url")
+    console.log('send url');
     return { url: session.url };
   }
 
@@ -91,13 +82,12 @@ if (user.payment) {
     if (!rawBody) {
       throw new BadRequestException('No webhook payload was provided.');
     }
-     console.log("before stripe checked")
+    console.log('before stripe checked');
     try {
       event = this.stripe.webhooks.constructEvent(
         rawBody,
         signature,
-        process.env.STRIPE_WEBHOOK_SECRET as string
-
+        process.env.STRIPE_WEBHOOK_SECRET as string,
       );
     } catch {
       throw new BadRequestException('Invalid Stripe signature');
@@ -105,22 +95,23 @@ if (user.payment) {
 
     const data = event.data.object as Stripe.PaymentIntent;
     const metadata = data.metadata;
-     console.log(metadata, "not success but hite")
-     console.log(event.type);
-     
-     if (event.type === 'payment_intent.succeeded') {
-      console.log("successful")
-      const transactionId = data.id;
-      const amount = data.amount_received / 100; 
-      const userId = metadata.userId; 
+    console.log(metadata, 'not success but hite');
+    console.log(event.type);
 
-      this.logger.warn("")
+    if (event.type === 'payment_intent.succeeded') {
+      console.log('successful');
+      const transactionId = data.id;
+      const amount = data.amount_received / 100;
+      const userId = metadata.userId;
+
+      this.logger.warn('');
 
       try {
         await this.prisma.payment.create({
           data: {
             transactionId,
             amount,
+            durationDays: parseInt(metadata.durationDays),
             user: {
               connect: { id: userId },
             },
@@ -128,27 +119,25 @@ if (user.payment) {
         });
 
         await this.prisma.user.updateMany({
-  where: {
-    id: userId,
-  },
-  data: {
-    status: "PAID", // or any status you want to update to
-  },
-});
-
+          where: {
+            id: userId,
+          },
+          data: {
+            status: 'PAID', // or any status you want to update to
+          },
+        });
       } catch (error) {
         console.error('Error saving payment:', error);
         throw new BadRequestException('Failed to save payment');
       }
     }
 
-
     if (event.type === 'payment_intent.payment_failed') {
-     
     }
 
     return { received: true, type: event.type };
   }
+
 
  async getAllPayments(query: { page?: number; limit?: number; amount?: string }) {
   const { page = 1, limit = 10, amount } = query;
@@ -192,6 +181,7 @@ if (user.payment) {
     data: payments,
   };
 }
+
 
 
 }

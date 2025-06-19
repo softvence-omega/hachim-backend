@@ -12,18 +12,17 @@ import { ReplyService } from './reply.service';
 import { Response } from 'express';
 import sendResponse from '../utils/sendResponse';
 
-
 @Controller('replies')
 export class ReplyController {
   constructor(private readonly replyService: ReplyService) {}
 
   @Post()
   async createReply(
-    @Body() data: { content: string; commentId: string; },
+    @Body() data: { content: string; commentId: string },
     @Res() res: Response,
-    @Req() req
+    @Req() req,
   ) {
-    const result = await this.replyService.createReply(data ,req.user.sub);
+    const result = await this.replyService.createReply(data, req.user.sub);
 
     return sendResponse(res, {
       statusCode: HttpStatus.CREATED,

@@ -1,5 +1,12 @@
 // dto/request-reset-code.dto.ts
-import { IsEmail, IsString, Length, Matches, MinLength, ValidateIf } from 'class-validator';
+import {
+  IsEmail,
+  IsString,
+  Length,
+  Matches,
+  MinLength,
+  ValidateIf,
+} from 'class-validator';
 
 export class RequestResetCodeDto {
   @IsEmail({}, { message: 'Invalid email address' })

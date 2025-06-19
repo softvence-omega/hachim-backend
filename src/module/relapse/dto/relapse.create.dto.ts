@@ -1,11 +1,16 @@
 // src/modules/relapse/dto/relapse.create.dto.ts
 
 import { Type } from 'class-transformer';
-import { IsString, IsOptional, IsInt, IsDateString, IsBoolean, IsDate } from 'class-validator';
+import {
+  IsString,
+  IsOptional,
+  IsInt,
+  IsDateString,
+  IsBoolean,
+  IsDate,
+} from 'class-validator';
 
 export class CreateRelapseDto {
-  
-
   @IsOptional()
   @IsInt()
   Mood?: number;
@@ -31,10 +36,10 @@ export class CreateRelapseDto {
   level?: number;
 
   @IsDate()
-  @Type(() => Date) // 👈 This line ensures the plain string is transformed into a Date object
+  @Type(() => Date) 
   startDate: Date;
 
   @IsOptional()
   @IsBoolean()
-  isDeleted?: boolean; 
+  isDeleted?: boolean;
 }
