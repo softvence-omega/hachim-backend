@@ -10,18 +10,26 @@ datasource db {
 enum UserStatus {
   PAID
   UNPAID
+  COMPLETED
+}
+
+enum Role {
+  USER
+  ADMIN
 }
 
 model User {
   id        String     @id @default(uuid())
-  userName  String     @unique
+  userName  String?     @unique
   name      String?
   age       Int?
   status    UserStatus @default(UNPAID)
   email     String     @unique
-  password  String
+  role      Role     @default(USER)
+  password  String?
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
+  goals   String?
 
 
 
@@ -30,6 +38,7 @@ model User {
   likes           Like[]
   reply           Reply[]
   relapse  Relapse?
+  symptoms Symptoms?
 
 
   payment         Payment?
@@ -37,6 +46,21 @@ model User {
   sleepTrack      SleepTrack?
   motivationTrack MotivationTrack?
   Journal         Journal[]
+}
+
+
+model Symptoms {
+   id            String   @id @default(uuid())
+   mental String
+   physical String
+   social String
+   faith String
+   userId String @unique
+
+   user   User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 }
 
 model Payment {
@@ -139,3 +163,22 @@ model Relapse {
   user       User     @relation(fields: [userId], references: [id])
 
 }
+
+
+model OtpCode {
+  id        String   @id @default(uuid())
+  email     String
+  code      String
+  expiresAt DateTime
+  verified  Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+model Article {
+  id          String   @id @default(uuid())
+  title       String
+  description String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+

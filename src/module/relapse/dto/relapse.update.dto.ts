@@ -1,6 +1,10 @@
-import { IsString, IsDateString, IsInt, IsBoolean, IsOptional } from 'class-validator';
-
-
+import {
+  IsString,
+  IsDateString,
+  IsInt,
+  IsBoolean,
+  IsOptional,
+} from 'class-validator';
 
 export class UpdateRelapseDto {
   @IsString()

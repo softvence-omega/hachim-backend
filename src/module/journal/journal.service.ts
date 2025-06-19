@@ -1,8 +1,8 @@
-import { BadRequestException, Injectable } from "@nestjs/common";
-import { PrismaService } from "src/prisma/prisma.service";
-import { CreateJournalDto } from "./dto/create-journal.dto";
-import { UpdateJournalDto } from "./dto/update-journal.dto";
-import { format } from "date-fns"; 
+import { BadRequestException, Injectable } from '@nestjs/common';
+import { PrismaService } from 'src/prisma/prisma.service';
+import { CreateJournalDto } from './dto/create-journal.dto';
+import { UpdateJournalDto } from './dto/update-journal.dto';
+import { format } from 'date-fns';
 
 @Injectable()
 export class JournalService {
@@ -28,11 +28,11 @@ export class JournalService {
       orderBy: { date: 'desc' },
     });
 
-  // format the output if frontend wants human-readable time
-    return journals.map(journal => ({
+    // format the output if frontend wants human-readable time
+    return journals.map((journal) => ({
       ...journal,
-      formattedDate: format(journal.date, 'dd MMMM yy'), 
-      formattedTime: format(journal.date, 'hh:mm a'), 
+      formattedDate: format(journal.date, 'dd MMMM yy'),
+      formattedTime: format(journal.date, 'hh:mm a'),
     }));
   }
 
@@ -53,14 +53,14 @@ export class JournalService {
 
   async update(id: string, userId: string, dto: UpdateJournalDto) {
     const isJournalExist = await this.prisma.journal.findUnique({
-      where:{
-        id
-      }
-    })
+      where: {
+        id,
+      },
+    });
 
- if(!isJournalExist) {
-  throw new BadRequestException("the journal is not exist!")
- }
+    if (!isJournalExist) {
+      throw new BadRequestException('the journal is not exist!');
+    }
 
     const data: any = {};
     if (dto.note !== undefined) data.note = dto.note;
@@ -75,14 +75,14 @@ export class JournalService {
   }
 
   async delete(id: string, userId: string) {
- const isJournalExist = await this.prisma.journal.findUnique({
-      where:{
-        id
-      }
-    })
- if(!isJournalExist) {
-  throw new BadRequestException("the journal is not exist!")
- }
+    const isJournalExist = await this.prisma.journal.findUnique({
+      where: {
+        id,
+      },
+    });
+    if (!isJournalExist) {
+      throw new BadRequestException('the journal is not exist!');
+    }
     return this.prisma.journal.delete({
       where: { id, userId },
     });

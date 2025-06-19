@@ -1,11 +1,19 @@
-import { IsInt, Min, Max, IsOptional, IsString, IsISO8601, IsNotEmpty } from 'class-validator';
+import {
+  IsInt,
+  Min,
+  Max,
+  IsOptional,
+  IsString,
+  IsISO8601,
+  IsNotEmpty,
+} from 'class-validator';
 
 export class CreateJournalDto {
   @IsNotEmpty()
   @IsString()
   note: string;
 
- @IsNotEmpty()
+  @IsNotEmpty()
   @IsISO8601()
   date: string;
 
