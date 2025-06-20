@@ -33,7 +33,7 @@ export class UserController {
   }
 
   @Get()
-  @Roles(Role.ADMIN)
+  // @Roles(Role.ADMIN)
   async getAllUser(@Res() res: Response) {
     const data = await this.userService.getAllUser();
     return sendResponse(res, {

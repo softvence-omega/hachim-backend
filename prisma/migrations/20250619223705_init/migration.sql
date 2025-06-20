@@ -41,7 +41,8 @@ CREATE TABLE "Payment" (
     "amount" DOUBLE PRECISION NOT NULL,
     "transactionId" TEXT NOT NULL,
     "durationDays" INTEGER,
-    "email" TEXT,
+    "email" TEXT NOT NULL,
+    "userId" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
@@ -233,6 +234,9 @@ CREATE UNIQUE INDEX "Payment_transactionId_key" ON "Payment"("transactionId");
 CREATE UNIQUE INDEX "Payment_email_key" ON "Payment"("email");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "Payment_userId_key" ON "Payment"("userId");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "Like_userId_commentId_key" ON "Like"("userId", "commentId");
 
 -- CreateIndex
@@ -248,10 +252,10 @@ CREATE UNIQUE INDEX "MotivationTrack_userId_key" ON "MotivationTrack"("userId");
 CREATE UNIQUE INDEX "Relapse_userId_key" ON "Relapse"("userId");
 
 -- AddForeignKey
-ALTER TABLE "User" ADD CONSTRAINT "User_email_fkey" FOREIGN KEY ("email") REFERENCES "Payment"("email") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Symptoms" ADD CONSTRAINT "Symptoms_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Symptoms" ADD CONSTRAINT "Symptoms_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "Payment" ADD CONSTRAINT "Payment_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Comment" ADD CONSTRAINT "Comment_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
