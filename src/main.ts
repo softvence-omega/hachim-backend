@@ -13,7 +13,11 @@ async function bootstrap() {
     bodyParser: true,
   });
 
-  app.enableCors();
+  app.enableCors({
+    origin: '*', 
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    credentials: true,
+  });
 
   const reflector = app.get(Reflector);
   const prisma = app.get(PrismaService); // Get PrismaService instance
