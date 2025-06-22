@@ -17,7 +17,6 @@ import { MailerModule } from '@nestjs-modules/mailer';
 import { SeederService } from './seeder/seeder.service';
 import { ArticleModule } from './module/article/article.module';
 import { QuoteModule } from './module/quote/quote.module';
-import { sub } from 'date-fns';
 import { SubscriptionModule } from './module/subscription/subscription.module';
 import { RecoveryModule } from './module/recovery/recovery.modulet';
 import { VideoModule } from './module/video/video.module';
@@ -43,7 +42,6 @@ import { VideoModule } from './module/video/video.module';
     QuizModule,
     CommentModule,
     UserModule,
-
     PaymentModule,
     MotivationTrackModule,
     SleepTrackModule,
@@ -52,7 +50,7 @@ import { VideoModule } from './module/video/video.module';
     JournalModule,
     ArticleModule,
     QuoteModule,
-    recovery
+    RecoveryModule,
     SubscriptionModule,
     RecoveryModule,
     VideoModule,

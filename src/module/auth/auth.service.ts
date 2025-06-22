@@ -17,6 +17,7 @@ import {
   VerifyResetCodeDto,
 } from './dto/forget-reset-password.dto';
 import { ChangePasswordDto } from './dto/change-password.dto';
+import { isSubscriptionActive } from 'src/utils/isSubscriptionActive';
 
 @Injectable()
 export class AuthService {
@@ -28,6 +29,21 @@ export class AuthService {
 
   //register
   async register(dto: RegisterDto) {
+  const isPaid = await this.prisma.payment.findUnique({
+  where: {
+    email: dto.email
+  }
+});
+
+if (!isPaid) {
+  throw new BadRequestException('Please complete your payment first');
+}
+
+if (!isSubscriptionActive(isPaid.createdAt, isPaid.durationDays ?? 0)) {
+  throw new ForbiddenException('Your subscription has expired');
+}
+
+
     const existingUser = await this.prisma.user.findFirst({
       where: {
         OR: [{ userName: dto.userName }, { email: dto.email }],
@@ -49,6 +65,8 @@ export class AuthService {
         userName: dto.userName,
         email: dto.email,
         password: hashPassword,
+        
+        
       },
     });
 
@@ -67,6 +85,22 @@ export class AuthService {
       throw new BadRequestException('Email is required');
     }
 
+const isPaid = await this.prisma.payment.findUnique({
+  where: {
+    email:email
+  }
+});
+
+if (!isPaid) {
+  throw new BadRequestException('Please complete your payment first');
+}
+
+if (!isSubscriptionActive(isPaid.createdAt, isPaid.durationDays ?? 0)) {
+  throw new ForbiddenException('Your subscription has expired');
+}
+
+
+
     let user = await this.prisma.user.findUnique({
       where: { email },
     });
@@ -76,6 +110,7 @@ export class AuthService {
       user = await this.prisma.user.create({
         data: {
           email,
+
         },
       });
     }
@@ -90,25 +125,43 @@ export class AuthService {
   }
 
   //login
-  async signIn(dto: LoginDto) {
-    const user = await this.prisma.user.findUnique({
-      where: {
-        email: dto.email,
-      },
+ async signIn(dto: LoginDto) {
+  const user = await this.prisma.user.findUnique({
+    where: {
+      email: dto.email,
+    },
+  });
+
+  if (!user) {
+    throw new ForbiddenException('Invalid Credentials');
+  }
+
+  const passwordMatches = await bcrypt.compare(dto.password, user.password!);
+  if (!passwordMatches) {
+    throw new ForbiddenException('Invalid Credentials');
+  }
+
+  // ✅ Skip payment check if admin
+  if (user.role !== 'ADMIN') {
+    const isPaid = await this.prisma.payment.findUnique({
+      where: { email: dto.email },
     });
 
-    if (!user) {
-      throw new ForbiddenException('Invalid Credentials');
+    if (!isPaid) {
+      throw new BadRequestException('Please complete your payment first');
     }
 
-    const passwordMatches = await bcrypt.compare(dto.password, user.password!);
-    if (!passwordMatches) {
-      throw new ForbiddenException('Invalid Credentials');
+    if (
+      !isSubscriptionActive(isPaid.createdAt, isPaid.durationDays ?? 0)
+    ) {
+      throw new ForbiddenException('Your subscription has expired');
     }
-
-    const tokens = await this.getTokens(user.id, user.email, user.role);
-    return tokens;
   }
+
+  const tokens = await this.getTokens(user.id, user.email, user.role);
+  return tokens;
+}
+
 
   //refresh token
   async refreshTokens(token: string) {
@@ -268,3 +321,5 @@ export class AuthService {
     return bcrypt.hash(data, saltRounds);
   }
 }
+
+
