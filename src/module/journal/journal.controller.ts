@@ -26,6 +26,7 @@ export class JournalController {
     @Req() req: Request,
     @Res() res: Response,
   ) {
+    console.log(req.user)
     const data = await this.journalService.create(req.user!.sub, dto);
     return sendResponse(res, {
       statusCode: HttpStatus.CREATED,

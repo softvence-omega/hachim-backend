@@ -2,7 +2,6 @@ import { NestFactory, Reflector } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { JwtGuard } from './common/guards/jwt.guard';
-// import { GlobalExceptionFilter } from './common/filters/global-exception.filter';
 import { RolesGuard } from './common/guards/roles.guard';
 import { PrismaService } from './prisma/prisma.service';
 
@@ -13,10 +12,14 @@ async function bootstrap() {
     bodyParser: true,
   });
 
-  app.enableCors();
+  app.enableCors({
+    origin: '*', 
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    credentials: true,
+  });
 
   const reflector = app.get(Reflector);
-  const prisma = app.get(PrismaService); // Get PrismaService instance
+  const prisma = app.get(PrismaService);
 
   app.useGlobalGuards(
     new JwtGuard(reflector, prisma),
