@@ -27,6 +27,14 @@ export class PaymentService {
     const {durationDays, amount ,email } = dto;
 
   
+    const isPayment = await this.prisma.payment.findFirst({
+      where: { email,subscription:true },
+    })
+
+    if(isPayment){
+      throw new BadRequestException('You have already subscribed');
+    }
+
 
     
     
