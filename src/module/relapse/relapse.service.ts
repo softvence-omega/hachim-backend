@@ -40,6 +40,23 @@ export class RelapseService {
       throw new NotFoundException('Relapse record not found for this user');
     }
 
+    const recoveryupdate = await this.prisma.userRecovery.update({
+  where: { userId },
+  data: {
+    streakDays: 0,
+    sleepScore: 0,
+    moodScore: 0,
+    recoveryPercentage: 0,
+    improvedConfidence: 0,
+    increasedLibido: 0,
+    mentalClarity: 0,
+   
+    
+  },
+});
+
+
+
     const updated = await this.prisma.relapse.update({
       where: { userId },
       data: {
@@ -49,6 +66,8 @@ export class RelapseService {
         note: null,
         spendDate: null,
         level: null,
+         createdAt: new Date(),
+        
       },
     });
 

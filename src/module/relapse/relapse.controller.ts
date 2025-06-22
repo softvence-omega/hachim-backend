@@ -31,7 +31,7 @@ export class RelapseController {
       req.user.sub,
     );
      const timeDifferentInDays: number = Math.floor(data.timeDifferent / (1000 * 60 * 60 * 24));
-     await this.recovery.updateRecovery(req.user.sub, { streakDays: timeDifferentInDays });
+     await this.recovery.updateRecovery(req.user.sub, { streakDays: Math.abs(timeDifferentInDays)});
     
     return sendResponse(res, {
       statusCode: HttpStatus.CREATED,
@@ -43,6 +43,7 @@ export class RelapseController {
 
   @Put('reset')
   async resetOptionalFields(@Req() req, @Res() res: Response) {
+    
     const result = await this.relapseService.resetOptionalFields(req.user.sub);
 
     return sendResponse(res, {
