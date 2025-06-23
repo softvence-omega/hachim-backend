@@ -42,6 +42,7 @@ CREATE TABLE "Payment" (
     "transactionId" TEXT NOT NULL,
     "durationDays" INTEGER,
     "email" TEXT NOT NULL,
+    "subscription" BOOLEAN NOT NULL DEFAULT true,
     "userId" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,

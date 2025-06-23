@@ -88,15 +88,14 @@ export class QuizService {
 
   async calculateScore(
     answers: { title: string; answer: string }[],
-    userinfo: { name: string; age: number },
-    userId: string,
+  
   ) {
-    await prisma.user.update({
-      where: { id: userId },
-      data: {
-        ...userinfo,
-      },
-    });
+    // await prisma.user.update({
+    //   where: { id: userId },
+    //   data: {
+    //     ...userinfo,
+    //   },
+    // });
 
     let totalPoints = 0;
     let maxPoints = 0;
