@@ -24,7 +24,6 @@ export class JournalService {
 
   async findAll(userId: string) {
     const journals = await this.prisma.journal.findMany({
-      take:10,
       where: { userId },
       orderBy: { date: 'desc' },
     });

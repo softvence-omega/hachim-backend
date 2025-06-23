@@ -28,108 +28,103 @@ export class AuthService {
   ) {}
 
   //register
-  async register(dto: RegisterDto) {
-  const isPaid = await this.prisma.payment.findUnique({
-  where: {
-    email: dto.email
+async register(dto: RegisterDto) {
+  const payments = await this.prisma.payment.findMany({
+    where: { email: dto.email },
+    orderBy: { createdAt: 'desc' },
+  });
+if (payments.length === 0) {
+    throw new BadRequestException('Please complete your payment first');
   }
-});
+  const activePayment = payments.find(payment =>
+    isSubscriptionActive(payment.createdAt, payment.durationDays ?? 0)
+  );
 
-if (!isPaid) {
-  throw new BadRequestException('Please complete your payment first');
-}
-
-if (!isSubscriptionActive(isPaid.createdAt, isPaid.durationDays ?? 0)) {
-  throw new ForbiddenException('Your subscription has expired');
-}
-
-
-    const existingUser = await this.prisma.user.findFirst({
-      where: {
-        OR: [{ userName: dto.userName }, { email: dto.email }],
-      },
+  if (!activePayment) {
+    await this.prisma.payment.updateMany({
+      where: { email: dto.email, subscription: true },
+      data: { subscription: false },
     });
 
-    if (existingUser) {
-      throw new BadRequestException('The email or username is already exist!');
-    }
-    if (dto.password !== dto.confirmPassword) {
-      throw new BadRequestException(
-        "Password and Confirm password doesn't match!",
-      );
-    }
-    const hashPassword = await this.hashData(dto.password);
-
-    const newUser = await this.prisma.user.create({
-      data: {
-        userName: dto.userName,
-        email: dto.email,
-        password: hashPassword,
-        
-        
-      },
-    });
-
-    const tokens = await this.getTokens(
-      newUser.id,
-      newUser.email,
-      newUser.role,
-    );
-
-    return { newUser, ...tokens };
+    throw new ForbiddenException('Your subscription has expired');
   }
+
+  const existingUser = await this.prisma.user.findFirst({
+    where: {
+      OR: [{ userName: dto.userName }, { email: dto.email }],
+    },
+  });
+
+  if (existingUser) {
+    throw new BadRequestException('The email or username is already exist!');
+  }
+
+  if (dto.password !== dto.confirmPassword) {
+    throw new BadRequestException("Password and Confirm password doesn't match!");
+  }
+
+  const hashPassword = await this.hashData(dto.password);
+
+  const newUser = await this.prisma.user.create({
+    data: {
+      userName: dto.userName,
+      email: dto.email,
+      password: hashPassword,
+    },
+  });
+
+  const tokens = await this.getTokens(newUser.id, newUser.email, newUser.role);
+
+  return { newUser, ...tokens };
+}
+
 
   // socialLogin
-  async socialLogin(email: string) {
-    if (!email) {
-      throw new BadRequestException('Email is required');
-    }
-
-const isPaid = await this.prisma.payment.findUnique({
-  where: {
-    email:email
+async socialLogin(email: string) {
+  if (!email) {
+    throw new BadRequestException('Email is required');
   }
-});
 
-if (!isPaid) {
-  throw new BadRequestException('Please complete your payment first');
-}
+  const payments = await this.prisma.payment.findMany({
+    where: { email },
+    orderBy: { createdAt: 'desc' },
+  });
+if (payments.length === 0) {
+    throw new BadRequestException('Please complete your payment first');
+  }
+  const activePayment = payments.find(payment =>
+    isSubscriptionActive(payment.createdAt, payment.durationDays ?? 0)
+  );
 
-if (!isSubscriptionActive(isPaid.createdAt, isPaid.durationDays ?? 0)) {
-  throw new ForbiddenException('Your subscription has expired');
-}
-
-
-
-    let user = await this.prisma.user.findUnique({
-      where: { email },
+  if (!activePayment) {
+    await this.prisma.payment.updateMany({
+      where: { email, subscription: true },
+      data: { subscription: false },
     });
 
-    // Create new user if not exists
-    if (!user) {
-      user = await this.prisma.user.create({
-        data: {
-          email,
-
-        },
-      });
-    }
-
-    const tokens = await this.getTokens(user.id, user.email, user.role);
-
-    return {
-      message: 'Login successful',
-      user,
-      ...tokens,
-    };
+    throw new ForbiddenException('Your subscription has expired');
   }
 
+  let user = await this.prisma.user.findUnique({ where: { email } });
+
+  if (!user) {
+    user = await this.prisma.user.create({ data: { email } });
+  }
+
+  const tokens = await this.getTokens(user.id, user.email, user.role);
+
+  return {
+    message: 'Login successful',
+    user,
+    ...tokens,
+  };
+}
+
+
   //login
- async signIn(dto: LoginDto) {
+async signIn(dto: LoginDto) {
   const user = await this.prisma.user.findUnique({
-    where: {
-      email: dto.email,
-    },
+    where: { email: dto.email },
   });
 
   if (!user) {
@@ -141,19 +136,24 @@ if (!isSubscriptionActive(isPaid.createdAt, isPaid.durationDays ?? 0)) {
     throw new ForbiddenException('Invalid Credentials');
   }
 
-  // ✅ Skip payment check if admin
   if (user.role !== 'ADMIN') {
-    const isPaid = await this.prisma.payment.findUnique({
+    const payments = await this.prisma.payment.findMany({
       where: { email: dto.email },
+      orderBy: { createdAt: 'desc' },
     });
+if (payments.length === 0) {
+    throw new BadRequestException('Please complete your payment first');
+  }
+    const activePayment = payments.find(payment =>
+      isSubscriptionActive(payment.createdAt, payment.durationDays ?? 0)
+    );
 
-    if (!isPaid) {
-      throw new BadRequestException('Please complete your payment first');
-    }
+    if (!activePayment) {
+      await this.prisma.payment.updateMany({
+        where: { email: dto.email, subscription: true },
+        data: { subscription: false },
+      });
 
-    if (
-      !isSubscriptionActive(isPaid.createdAt, isPaid.durationDays ?? 0)
-    ) {
       throw new ForbiddenException('Your subscription has expired');
     }
   }
@@ -161,6 +161,7 @@ if (!isSubscriptionActive(isPaid.createdAt, isPaid.durationDays ?? 0)) {
   const tokens = await this.getTokens(user.id, user.email, user.role);
   return tokens;
 }
+
 
 
   //refresh token
