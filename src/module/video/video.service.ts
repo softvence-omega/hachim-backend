@@ -51,7 +51,7 @@ export class VideoService {
   }
 
   async findAll() {
-    return this.prisma.video.findMany({take:10});
+    return this.prisma.video.findMany({take:100});
   }
 
   async findOne(id: string) {

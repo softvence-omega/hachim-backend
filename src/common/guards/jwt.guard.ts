@@ -10,7 +10,6 @@ import { IS_PUBLIC_KEY } from '../decorators/public.decorators';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { isSubscriptionActive } from 'src/utils/isSubscriptionActive';
 
-
 @Injectable()
 export class JwtGuard extends AuthGuard('jwt') implements CanActivate {
   constructor(
@@ -36,14 +35,25 @@ export class JwtGuard extends AuthGuard('jwt') implements CanActivate {
     const request = context.switchToHttp().getRequest();
     const user = request.user;
 
-
     if (user.role === 'ADMIN') return true;
 
-    const payment = await this.prisma.payment.findUnique({
+    // 🔍 Get all payments, latest first
+    const payments = await this.prisma.payment.findMany({
       where: { email: user.email },
+      orderBy: { createdAt: 'desc' },
     });
- console.log(user,payment)
-    if (!payment || !isSubscriptionActive(payment.createdAt, payment.durationDays ?? 0)) {
+
+    const activePayment = payments.find(payment =>
+      isSubscriptionActive(payment.createdAt, payment.durationDays ?? 0),
+    );
+
+    if (!activePayment) {
+      // 🔄 Optionally mark all as inactive
+      await this.prisma.payment.updateMany({
+        where: { email: user.email, subscription: true },
+        data: { subscription: false },
+      });
+
       throw new ForbiddenException('Subscription expired. Please renew your plan.');
     }
 

@@ -12,7 +12,7 @@ export class ArticleService {
   }
 
   findAll() {
-    return this.prisma.article.findMany({ orderBy: { createdAt: 'desc' },take:10});
+    return this.prisma.article.findMany({ orderBy: { createdAt: 'desc' },take:200});
   }
 
   async findOne(id: string) {
