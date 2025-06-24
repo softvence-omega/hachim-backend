@@ -1,14 +1,28 @@
 // src/modules/payment/payment.dto.ts
-
-import { IsEmail, IsNumber } from 'class-validator';
+import { IsEmail, IsNumber, Min } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
 
 export class CreatePaymentDto {
-  @IsNumber()
+  @ApiProperty({
+    example: 100.5,
+    description: 'Amount to be paid',
+  })
+  @IsNumber({}, { message: 'Amount must be a number' })
+  @Min(0, { message: 'Amount must be at least 0' })
   amount: number;
 
-  @IsNumber()
+  @ApiProperty({
+    example: 30,
+    description: 'Duration in days for the payment or subscription',
+  })
+  @IsNumber({}, { message: 'Duration must be a number' })
+  @Min(1, { message: 'Duration must be at least 1 day' })
   durationDays: number;
 
-  @IsEmail()
+  @ApiProperty({
+    example: 'user@example.com',
+    description: 'Email address associated with the payment',
+  })
+  @IsEmail({}, { message: 'Email must be valid' })
   email: string;
 }

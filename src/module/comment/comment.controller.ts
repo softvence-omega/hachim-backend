@@ -12,6 +12,8 @@ import {
 import { CommentService } from './comment.service';
 import { Request, Response } from 'express';
 import sendResponse from '../utils/sendResponse';
+import { CreateCommentDto } from './dto/comment.dto';
+import { ApiParam } from '@nestjs/swagger';
 
 @Controller('comments')
 export class CommentController {
@@ -19,7 +21,7 @@ export class CommentController {
 
   @Post()
   async createComment(
-    @Body() data: { content: string },
+    @Body() data:CreateCommentDto,
     @Res() res: Response,
     @Req() req,
   ) {
@@ -33,25 +35,46 @@ export class CommentController {
     });
   }
 
-  @Get(':postId')
-  async getCommentsByPost(
-    @Param('postId') postId: string,
-    @Res() res: Response,
-  ) {
-    const result = await this.commentService.getCommentsByPost(postId);
+  // @Get(':postId')
+  // async getCommentsByPost(
+  //   @Param('postId') postId: string,
+  //   @Res() res: Response,
+  // ) {
+  //   const result = await this.commentService.getCommentsByPost(postId);
 
-    return sendResponse(res, {
-      statusCode: HttpStatus.OK,
-      success: true,
-      message: 'Comments retrieved successfully',
-      data: result,
-    });
-  }
+  //   return sendResponse(res, {
+  //     statusCode: HttpStatus.OK,
+  //     success: true,
+  //     message: 'Comments retrieved successfully',
+  //     data: result,
+  //   });
+  // }
+
+  @Get(':postId')
+  @ApiParam({
+  name: 'postId',
+  type: String,
+  description: 'ID of the post to retrieve comments for',
+  example: 'b1234a56-78cd-90ef-1234-567890abcdef',
+})
+async getCommentsByPost(
+  @Param('postId') postId: string,
+  @Res() res: Response,
+) {
+  const result = await this.commentService.getCommentsByPost(postId);
+
+  return sendResponse(res, {
+    statusCode: HttpStatus.OK,
+    success: true,
+    message: 'Comments retrieved successfully',
+    data: result,
+  });
+}
 
   @Get()
-  async getAllComments(@Query('limit') limit: string, @Res() res: Response) {
-    const parsedLimit = parseInt(limit, 10) || 10;
-    const data = await this.commentService.getAllComments(parsedLimit);
+  async getAllComments( @Res() res: Response) {
+  
+    const data = await this.commentService.getAllComments();
 
     return sendResponse(res, {
       statusCode: HttpStatus.OK,
