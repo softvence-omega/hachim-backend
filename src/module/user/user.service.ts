@@ -4,6 +4,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { Role } from '@prisma/client';
 import { CreateAdminDto } from './dto/create-admin.dto';
 import * as bcrypt from 'bcrypt';
+import { isSubscriptionActive } from 'src/utils/isSubscriptionActive';
 @Injectable()
 export class UserService {
   constructor(private prisma: PrismaService) {}
@@ -33,8 +34,33 @@ export class UserService {
   }
 
   async getAllUser() {
-    const result = await this.prisma.user.findMany();
-    return result;
+   const users = await this.prisma.user.findMany({
+    include: {
+      payment: {
+        orderBy: { createdAt: 'desc' }, // ensures latest is first
+      },
+    },
+  });
+
+  return users.map(user => {
+    const latestPayment = user.payment[0]; // most recent
+    const isActive = latestPayment
+      ? isSubscriptionActive(latestPayment.createdAt, latestPayment.durationDays ?? 0)
+      : false;
+
+    return {
+      id: user.id,
+      userName: user.userName,
+      email: user.email,
+      role: user.role,
+      status: user.status,
+      createdAt: user.createdAt,
+      hasActiveSubscription: isActive,
+      latestPaymentDate: latestPayment?.createdAt ?? null,
+      paymentDurationDays: latestPayment?.durationDays ?? null,
+      totalPayments: user.payment.length,
+    };
+  });
   }
 
   async updateUser(email: string, dto: UpdateUserDto) {
