@@ -61,6 +61,10 @@ export class SubscriptionService {
     });
   }
 
+  async getAllActiveInActive() {
+    return this.prisma.subscription.findMany();
+  }
+
   async delete(id: string) {
     const exists = await this.prisma.subscription.findUnique({ where: { id } });
     if (!exists) throw new NotFoundException('Subscription not found');
