@@ -8,18 +8,10 @@ import { UpdateSubscriptionDto } from './dto/update.subscrition';
 export class SubscriptionService {
   constructor(private prisma: PrismaService) {}
 
-  async create(dto: CreateSubscriptionDto,userId:string) {
-  const existingUser = await this.prisma.user.findUnique({
-    where: { id: userId },
-  });
-
-  if (!existingUser) {
-    throw new NotFoundException('User not found');
-  }
+  async create(dto: CreateSubscriptionDto) {
 
   const data = await this.prisma.subscription.create({
     data: {
-      userId:existingUser.id,
       amount: dto.amount,
       durationDays: dto.durationDays,
     },
@@ -44,25 +36,24 @@ export class SubscriptionService {
 }
 
 
-  async getAllActive(userId: string) {
+  async getAllActive() {
     return this.prisma.subscription.findMany({
       where: {
-        userId,
         isActive: true,
       
       },
     });
   }
 
-  async getAll(userId: string) {
-    return this.prisma.subscription.findMany({
-      where: { userId },
-      
-    });
-  }
-
   async getAllActiveInActive() {
     return this.prisma.subscription.findMany();
+  }
+
+  async getSingleSubscription(id:string) {
+    const result = await this.prisma.subscription.findUnique({
+      where:{id,isActive:true}
+    })
+    return result
   }
 
   async delete(id: string) {
