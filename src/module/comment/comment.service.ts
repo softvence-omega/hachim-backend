@@ -1,11 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
+import { CreateCommentDto } from './dto/comment.dto';
 
 const prisma = new PrismaClient();
 
 @Injectable()
 export class CommentService {
-  async createComment(data: { content: string }, userId: string) {
+  async createComment(data: CreateCommentDto, userId: string) {
     return prisma.comment.create({
       data: {
         ...data,
@@ -29,9 +30,9 @@ export class CommentService {
     });
   }
 
-  async getAllComments(limit: number) {
+  async getAllComments() {
     return prisma.comment.findMany({
-      take: limit,
+      
       orderBy: {
         createdAt: 'desc',
       },

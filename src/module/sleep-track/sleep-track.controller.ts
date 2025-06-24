@@ -12,6 +12,8 @@ import { SleepTrackService } from './sleep-track.service';
 import { Response } from 'express';
 import sendResponse from '../utils/sendResponse';
 import { RecoveryService } from '../recovery/services/recovery.services';
+import { CreateSleepDto } from './dto/sleep-track.dto';
+import { ApiOperation, ApiResponse } from '@nestjs/swagger';
 
 @Controller('sleep-track')
 export class SleepTrackController {
@@ -23,7 +25,7 @@ export class SleepTrackController {
 
   @Post()
   async createSleep(
-    @Body() data: { hours: number },
+    @Body() data:CreateSleepDto,
     @Res() res: Response,
     @Req() req,
   ) {
@@ -37,7 +39,13 @@ export class SleepTrackController {
     });
   }
 
+
   @Get()
+  @ApiOperation({ summary: 'Get sleep data for the authenticated user' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Sleep data retrieved successfully',
+  })
   async getSleepByUser(@Req() req, @Res() res: Response) {
     const result = await this.sleepTrackService.getSleepByUser(req.user.sub);
 

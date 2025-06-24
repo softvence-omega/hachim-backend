@@ -4,6 +4,7 @@ import { ValidationPipe } from '@nestjs/common';
 import { JwtGuard } from './common/guards/jwt.guard';
 import { RolesGuard } from './common/guards/roles.guard';
 import { PrismaService } from './prisma/prisma.service';
+import { setupSwagger } from './swagger/swagger.setup';
 
 
 async function bootstrap() {
@@ -33,7 +34,7 @@ async function bootstrap() {
       transform: true,
     }),
   );
-
+ setupSwagger(app);
   await app.listen(process.env.PORT ?? 3000);
 }
 

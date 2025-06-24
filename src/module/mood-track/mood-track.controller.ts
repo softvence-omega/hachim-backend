@@ -12,6 +12,7 @@ import { MoodTrackService } from './mood-track.service';
 import { Response } from 'express';
 import sendResponse from '../utils/sendResponse';
 import { RecoveryService } from '../recovery/services/recovery.services';
+import { CreateMoodDto } from './dto/mood-track.dto';
 
 @Controller('mood-track')
 export class MoodTrackController {
@@ -22,7 +23,7 @@ export class MoodTrackController {
 
   @Post()
   async createMood(
-    @Body() data: { value: number; userId: string },
+    @Body() data:CreateMoodDto,
     @Res() res: Response,
     @Req() req,
   ) {

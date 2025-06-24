@@ -11,6 +11,7 @@ import {
 import { MotivationTrackService } from './motivation-track.service';
 import { Response } from 'express';
 import sendResponse from '../utils/sendResponse';
+import { CreateMotivationDto } from './dto/motivation-trac.dto';
 
 @Controller('motivation-track')
 export class MotivationTrackController {
@@ -20,7 +21,7 @@ export class MotivationTrackController {
 
   @Post()
   async createMotivation(
-    @Body() data: { motivation: string },
+    @Body() data:CreateMotivationDto,
     @Res() res: Response,
     @Req() req,
   ) {

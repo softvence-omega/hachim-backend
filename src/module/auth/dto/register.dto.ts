@@ -5,24 +5,40 @@ import {
   IsString,
   MinLength,
 } from 'class-validator';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class RegisterDto {
+  @ApiPropertyOptional({
+    example: 'john_doe',
+    description: 'Optional username of the user',
+  })
   @IsOptional()
-  @IsString()
-  @IsNotEmpty()
-  userName: string;
+  @IsString({ message: 'Username must be a string' })
+  userName?: string;
 
-  @IsNotEmpty({ message: 'email is required!' })
-  @IsEmail()
+  @ApiProperty({
+    example: 'user@example.com',
+    description: 'User email address',
+  })
+  @IsNotEmpty({ message: 'Email is required!' })
+  @IsEmail({}, { message: 'Email must be valid!' })
   email: string;
 
-  @IsNotEmpty({ message: 'password is required!' })
-  @IsString()
-  @MinLength(6)
+  @ApiProperty({
+    example: 'strongPassword123',
+    description: 'Password with at least 6 characters',
+  })
+  @IsNotEmpty({ message: 'Password is required!' })
+  @IsString({ message: 'Password must be a string' })
+  @MinLength(6, { message: 'Password must be at least 6 characters' })
   password: string;
 
-  @IsNotEmpty({ message: 'confirm password is required!' })
-  @IsString()
-  @MinLength(6)
+  @ApiProperty({
+    example: 'strongPassword123',
+    description: 'Confirm password (must match password)',
+  })
+  @IsNotEmpty({ message: 'Confirm password is required!' })
+  @IsString({ message: 'Confirm password must be a string' })
+  @MinLength(6, { message: 'Confirm password must be at least 6 characters' })
   confirmPassword: string;
 }

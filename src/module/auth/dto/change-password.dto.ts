@@ -1,14 +1,27 @@
 // src/user/dto/change-password.dto.ts
-import { IsString, MinLength } from 'class-validator';
+import { IsString, MinLength, Matches } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
 
 export class ChangePasswordDto {
-  @IsString()
+  @ApiProperty({
+    example: 'oldPassword123',
+    description: 'Your current password',
+  })
+  @IsString({ message: 'Old password must be a string.' })
   oldPassword: string;
 
-  @IsString()
-  @MinLength(6)
+  @ApiProperty({
+    example: 'newSecurePass456',
+    description: 'Your new password (minimum 6 characters)',
+  })
+  @IsString({ message: 'New password must be a string.' })
+  @MinLength(6, { message: 'New password must be at least 6 characters long.' })
   newPassword: string;
 
-  @IsString()
+  @ApiProperty({
+    example: 'newSecurePass456',
+    description: 'Repeat the new password to confirm',
+  })
+  @IsString({ message: 'Confirm password must be a string.' })
   confirmPassword: string;
 }
