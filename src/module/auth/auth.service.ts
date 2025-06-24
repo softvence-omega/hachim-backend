@@ -33,11 +33,13 @@ async register(dto: RegisterDto) {
     where: { email: dto.email },
     orderBy: { createdAt: 'desc' },
   });
-if (payments.length === 0) {
+
+  if (payments.length === 0) {
     throw new BadRequestException('Please complete your payment first');
   }
+
   const activePayment = payments.find(payment =>
-    isSubscriptionActive(payment.createdAt, payment.durationDays ?? 0)
+    isSubscriptionActive(payment.createdAt, payment.durationDays ?? 0),
   );
 
   if (!activePayment) {
@@ -73,6 +75,17 @@ if (payments.length === 0) {
     },
   });
 
+  // ✅ Link payment records to new user
+  await this.prisma.payment.updateMany({
+    where: {
+      email: newUser.email,
+      userId: null,
+    },
+    data: {
+      userId: newUser.id,
+    },
+  });
+
   const tokens = await this.getTokens(newUser.id, newUser.email, newUser.role);
 
   return { newUser, ...tokens };
@@ -89,11 +102,13 @@ async socialLogin(email: string) {
     where: { email },
     orderBy: { createdAt: 'desc' },
   });
-if (payments.length === 0) {
+
+  if (payments.length === 0) {
     throw new BadRequestException('Please complete your payment first');
   }
+
   const activePayment = payments.find(payment =>
-    isSubscriptionActive(payment.createdAt, payment.durationDays ?? 0)
+    isSubscriptionActive(payment.createdAt, payment.durationDays ?? 0),
   );
 
   if (!activePayment) {
@@ -109,6 +124,17 @@ if (payments.length === 0) {
 
   if (!user) {
     user = await this.prisma.user.create({ data: { email } });
+
+    // ✅ Link pre-payment to newly created user
+    await this.prisma.payment.updateMany({
+      where: {
+        email: user.email,
+        userId: null,
+      },
+      data: {
+        userId: user.id,
+      },
+    });
   }
 
   const tokens = await this.getTokens(user.id, user.email, user.role);
@@ -119,6 +145,7 @@ if (payments.length === 0) {
     ...tokens,
   };
 }
+
 
 
   //login
