@@ -21,6 +21,7 @@ import { diskStorage } from 'multer';
 import { extname } from 'path';
 import { Roles } from 'src/common/decorators/roles.decorator';
 import { Role } from '@prisma/client';
+import { ApiBody, ApiConsumes, ApiOperation } from '@nestjs/swagger';
 
 @Controller('video')
 export class VideoController {
@@ -28,6 +29,22 @@ export class VideoController {
 
   @Post('create')
   @Roles(Role.ADMIN)
+  @ApiOperation({ summary: 'Create a video with file upload' })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    description: 'Create Video',
+    schema: {
+      type: 'object',
+      properties: {
+        title: { type: 'string', example: 'My video title' },
+        file: {
+          type: 'string',
+          format: 'binary',
+        },
+      },
+      required: ['title', 'file'],
+    },
+  })
   @UseInterceptors(FileInterceptor('file', {
     storage: diskStorage({
       destination: './uploads/videos',
@@ -41,8 +58,15 @@ export class VideoController {
     @Body() dto: CreateVideoDto,
     @Res() res: Response,
     @UploadedFile() file?: Express.Multer.File,
-  
   ) {
+    console.log(file)
+    if (!file) {
+      return res.status(HttpStatus.BAD_REQUEST).json({
+        success: false,
+        message: 'File is required',
+      });
+    }
+
     const data = await this.videoService.create(dto, file);
     return sendResponse(res, {
       statusCode: HttpStatus.CREATED,
