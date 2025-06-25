@@ -26,3 +26,12 @@ export class CreatePaymentDto {
   @IsEmail({}, { message: 'Email must be valid' })
   email: string;
 }
+
+export class CheckPaymentQueryDto {
+  @ApiProperty({
+    example: 'user@example.com',
+    description: 'Email address associated with the payment',
+  })
+  @IsEmail({}, { message: 'Email must be valid' })
+  email: string;
+}
