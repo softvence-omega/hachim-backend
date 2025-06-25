@@ -24,10 +24,10 @@ export class QuoteService {
     const originalFileName = `${fileName}-${Date.now()}.${fileExt}`; 
       const uploadRes = await this.cloudinary.uploader.upload(file.path, {
         folder: 'quotes',
-        public_id: originalFileName, 
+        // public_id: originalFileName, 
       });
       imageUrl = uploadRes.secure_url;
-      publicId = uploadRes.public_id;
+      // publicId = uploadRes.public_id;
       // Delete local file after upload
   const filePath = join(process.cwd(), file.path);
   if (fs.existsSync(filePath)) {
@@ -40,7 +40,7 @@ export class QuoteService {
         name: dto.name,
         quote: dto.quote,
         imageUrl,
-        cloudinaryPublicId: publicId,
+        // cloudinaryPublicId: publicId,
       },
     });
   } catch (err) {
