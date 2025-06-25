@@ -47,7 +47,7 @@ export class VideoController {
   })
   @UseInterceptors(FileInterceptor('file', {
     storage: diskStorage({
-      destination: './uploads/videos',
+     destination: '/tmp',
       filename: (req, file, cb) => {
         const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
         cb(null, `${uniqueSuffix}${extname(file.originalname)}`);
@@ -59,7 +59,6 @@ export class VideoController {
     @Res() res: Response,
     @UploadedFile() file?: Express.Multer.File,
   ) {
-    console.log(file)
     if (!file) {
       return res.status(HttpStatus.BAD_REQUEST).json({
         success: false,
@@ -102,7 +101,7 @@ export class VideoController {
   @Roles(Role.ADMIN)
   @UseInterceptors(FileInterceptor('file', {
     storage: diskStorage({
-      destination: './uploads/videos',
+     destination: '/tmp',
       filename: (req, file, cb) => {
         const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
         cb(null, `${uniqueSuffix}${extname(file.originalname)}`);

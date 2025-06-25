@@ -38,7 +38,7 @@ constructor(private readonly quoteService: QuoteService) {}
   @UseInterceptors(
     FileInterceptor('file', {
       storage: diskStorage({
-        destination: './uploads',
+       destination: '/tmp',
         filename: (req, file, cb) => {
           const uniqueName = `${uuidv4()}${extname(file.originalname)}`;
           cb(null, uniqueName);
@@ -98,7 +98,7 @@ constructor(private readonly quoteService: QuoteService) {}
 @UseInterceptors(
   FileInterceptor('file', {
     storage: diskStorage({
-      destination: './uploads',
+   destination: '/tmp',
       filename: (req, file, cb) => {
         const uniqueName = `${uuidv4()}${extname(file.originalname)}`;
         cb(null, uniqueName);
