@@ -34,7 +34,10 @@ export class VideoService {
         });
         videoUrl = uploadRes.secure_url;
         publicId = uploadRes.public_id;
-        fs.unlinkSync(join(process.cwd(), file.path)); // cleanup local file
+       const filePath = join(process.cwd(), file.path);
+        if (fs.existsSync(filePath)) {
+          fs.unlinkSync(filePath);
+        } // cleanup local file
       }
 
       return await this.prisma.video.create({
@@ -83,7 +86,10 @@ export class VideoService {
       });
       videoUrl = uploadRes.secure_url;
       publicId = uploadRes.public_id;
-      fs.unlinkSync(join(process.cwd(), file.path));
+      const filePath = join(process.cwd(), file.path);
+       if (fs.existsSync(filePath)) {
+         fs.unlinkSync(filePath);
+       }
     }
 
     return this.prisma.video.update({

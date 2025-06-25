@@ -29,7 +29,10 @@ export class QuoteService {
       imageUrl = uploadRes.secure_url;
       publicId = uploadRes.public_id;
       // Delete local file after upload
-      fs.unlinkSync(join(process.cwd(), file.path));
+  const filePath = join(process.cwd(), file.path);
+  if (fs.existsSync(filePath)) {
+    fs.unlinkSync(filePath);
+  }
     }
 
     return await this.prisma.quote.create({
@@ -77,7 +80,10 @@ async update(id: string, dto: UpdateQuoteDto, file?: Express.Multer.File) {
     });
     imageUrl = uploadRes.secure_url;
     publicId = uploadRes.public_id;
-    fs.unlinkSync(join(process.cwd(), file.path)); // delete local
+    const filePath = join(process.cwd(), file.path);
+  if (fs.existsSync(filePath)) {
+    fs.unlinkSync(filePath);
+  }
   }
 
   return this.prisma.quote.update({
