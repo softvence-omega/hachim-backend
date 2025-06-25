@@ -6,7 +6,6 @@ import {
   Body,
   Req,
   Get,
-  Param,
   Headers,
   RawBodyRequest,
   Res,
@@ -15,10 +14,11 @@ import {
 } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { CreatePaymentDto } from '../dto/payment.dto';
-import Stripe from 'stripe';
 import sendResponse from 'src/module/utils/sendResponse';
 import { PaymentService } from '../services/payment.services';
 import { Public } from 'src/common/decorators/public.decorators';
+import { Roles } from 'src/common/decorators/roles.decorator';
+import { Role } from '@prisma/client';
 
 @Controller('payments')
 export class PaymentController {
@@ -55,18 +55,11 @@ export class PaymentController {
 
 
   @Get()
+  @Roles(Role.ADMIN)
   async getAllPayments(
-    @Query('page') page?: string,
-    @Query('limit') limit?: string,
     @Query('amount') amount?: string,
   ) {
-    const pageNumber = page ? parseInt(page, 10) : 1;
-    const limitNumber = limit ? parseInt(limit, 10) : 10;
-
-
     return this.paymentService.getAllPayments({
-      page: pageNumber,
-      limit: limitNumber,
       amount,
     });
   }

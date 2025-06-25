@@ -47,8 +47,6 @@ model User {
   sleepTrack      SleepTrack?
   motivationTrack MotivationTrack?
   Journal         Journal[]
-  subscriptions Subscription[]
-
   payment    Payment[]
 }
 
@@ -222,8 +220,6 @@ model UserRecovery {
 
 model Subscription {
   id           String   @id @default(uuid())
-  userId       String
-  user         User     @relation(fields: [userId], references: [id])
   amount       Float
   durationDays Int
   isActive     Boolean  @default(true)
