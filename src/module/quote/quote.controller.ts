@@ -10,6 +10,7 @@ import { diskStorage } from 'multer';
 import { extname } from 'path';
 import { v4 as uuidv4 } from 'uuid';
 import { UpdateQuoteDto } from './dto/update-qoute.dto';
+import { ApiBody, ApiConsumes, ApiOperation } from '@nestjs/swagger';
 
 @Controller('quote')
 export class QuoteController {
@@ -17,11 +18,27 @@ export class QuoteController {
 constructor(private readonly quoteService: QuoteService) {}
 
   @Post('create')
-  @Roles(Role.ADMIN)
+  @ApiOperation({ summary: 'Create a quote with an image (file required)' })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    description: 'Create Quote',
+    schema: {
+      type: 'object',
+      properties: {
+        name: { type: 'string', example: 'Albert Einstein' },
+        quote: { type: 'string', example: 'Imagination is more important than knowledge.' },
+        file: {
+          type: 'string',
+          format: 'binary',
+        },
+      },
+      required: ['name', 'quote', 'file'],
+    },
+  })
   @UseInterceptors(
     FileInterceptor('file', {
       storage: diskStorage({
-        destination: './uploads', 
+        destination: './uploads',
         filename: (req, file, cb) => {
           const uniqueName = `${uuidv4()}${extname(file.originalname)}`;
           cb(null, uniqueName);
@@ -34,14 +51,21 @@ constructor(private readonly quoteService: QuoteService) {}
     @Body() dto: CreateQuoteDto,
     @Res() res: Response,
   ) {
+    if (!file) {
+      return res.status(HttpStatus.BAD_REQUEST).json({
+        success: false,
+        message: 'Image file is required',
+      });
+    }
+
     const data = await this.quoteService.create(dto, file);
-    return sendResponse(res, {
+
+    return res.status(201).json({
       success: true,
-      statusCode: 201,
       message: 'Quote created with image successfully',
       data,
     });
-}
+  }
 
 
 
