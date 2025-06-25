@@ -11,8 +11,9 @@ import {
 import Stripe from 'stripe';
 
 import { Request } from 'express';
-import { CreatePaymentDto } from '../dto/payment.dto';
+import {  CheckPaymentQueryDto, CreatePaymentDto } from '../dto/payment.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { isSubscriptionActive } from 'src/utils/isSubscriptionActive';
 
 @Injectable()
 export class PaymentService {
@@ -171,6 +172,22 @@ export class PaymentService {
 //     data: payments,
 //   };
 // }
+
+
+async checkPayment(data:{email: string}) {
+ 
+   let subscription = false
+  const isPayment = await this.prisma.payment.findFirst({
+      where: {email:data.email,subscription:true },
+    })
+
+    if(isPayment){
+      console.log('isPayment', isPayment);
+      subscription = true
+      subscription = isSubscriptionActive(isPayment?.createdAt!, isPayment?.durationDays!);
+    }
+   return { subscription };
+}
 
 async getAllPayments(query: { amount?: string }) {
   const { amount } = query;
