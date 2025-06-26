@@ -35,7 +35,19 @@ export class JwtGuard extends AuthGuard('jwt') implements CanActivate {
     const request = context.switchToHttp().getRequest();
     const user = request.user;
 
-    if (user.role === 'ADMIN') return true;
+    const isBlocked = await this.prisma.user.findUnique({
+      where:{
+        email: user.email,
+        isBlocked:true
+      }
+    })
+    
+    if (isBlocked) {
+      throw new ForbiddenException('Your account is blocked');
+    }
+
+   if (user.role === 'ADMIN' || user.role === 'SUPER_ADMIN') return true;
+
 
     // 🔍 Get all payments, latest first
     const payments = await this.prisma.payment.findMany({
