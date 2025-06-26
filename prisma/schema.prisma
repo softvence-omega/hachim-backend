@@ -16,6 +16,7 @@ enum UserStatus {
 enum Role {
   USER
   ADMIN
+  SUPER_ADMIN
 }
 
 model User {
@@ -24,6 +25,7 @@ model User {
   name      String?
   age       Int?
   status    UserStatus @default(UNCOMPLETED)
+  isBlocked  Boolean  @default(false)
   email     String     @unique
   role      Role     @default(USER)
   password  String?

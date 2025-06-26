@@ -3,6 +3,7 @@ import {
   Controller,
   Get,
   HttpStatus,
+  Param,
   Patch,
   Post,
   Req,
@@ -11,17 +12,17 @@ import {
 import { UserService } from './user.service';
 import sendResponse from '../utils/sendResponse';
 import { Request, Response } from 'express';
-import { UpdateUserDto } from './dto/update-user.dto';
 import { Roles } from 'src/common/decorators/roles.decorator';
 import { Role } from '@prisma/client';
 import { CreateAdminDto } from './dto/create-admin.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
 
 @Controller('user')
 export class UserController {
   constructor(private userService: UserService) {}
 
   @Post('admin/create')
-  @Roles(Role.ADMIN)
+  @Roles(Role.SUPER_ADMIN)
   async createAdmin(@Body() dto: CreateAdminDto, @Res() res: Response) {
     const data = await this.userService.createAdmin(dto);
     return sendResponse(res, {
@@ -33,7 +34,7 @@ export class UserController {
   }
 
   @Get()
-  // @Roles(Role.ADMIN)
+  @Roles(Role.ADMIN)
   async getAllUser(@Res() res: Response) {
     const data = await this.userService.getAllUser();
     return sendResponse(res, {
@@ -44,18 +45,18 @@ export class UserController {
     });
   }
 
-  @Patch('update')
-  async updateUser(
+   @Roles(Role.SUPER_ADMIN)
+  @Patch('block/:id')
+  async updateUserBlockStatus(
+    @Param('id') id: string,
     @Body() dto: UpdateUserDto,
-    @Req() req: Request,
-    @Res() res: Response,
+    @Res() res: Response
   ) {
-    const email = req.user?.email;
-    const data = await this.userService.updateUser(email!, dto);
+    const data = await this.userService.updateUserBlockStatus(id, dto.isBlocked);
     return sendResponse(res, {
       statusCode: HttpStatus.OK,
       success: true,
-      message: 'Update user successfully',
+      message: 'Update user status successfully',
       data,
     });
   }
