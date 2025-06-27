@@ -33,7 +33,7 @@ export class RelapseController {
     const timeDifferentInDays: number = Math.floor(
       data.timeDifferent / (1000 * 60 * 60 * 24),
     );
-    const cappedStreakDays = Math.min(Math.abs(timeDifferentInDays), 99);
+    const cappedStreakDays = Math.min(Math.abs(timeDifferentInDays), 90);
 
     await this.recovery.updateRecovery(req.user.sub, {
       streakDays: cappedStreakDays,
