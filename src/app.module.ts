@@ -20,6 +20,7 @@ import { QuoteModule } from './module/quote/quote.module';
 import { SubscriptionModule } from './module/subscription/subscription.module';
 import { RecoveryModule } from './module/recovery/recovery.modulet';
 import { VideoModule } from './module/video/video.module';
+import { AnimationImageModule } from './module/Image/animation-image.module';
 
 
 @Module({
@@ -54,6 +55,7 @@ import { VideoModule } from './module/video/video.module';
     SubscriptionModule,
     RecoveryModule,
     VideoModule,
+    AnimationImageModule
   ],
   controllers: [AppController],
   providers: [AppService, SeederService],
