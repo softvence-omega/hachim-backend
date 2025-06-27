@@ -211,7 +211,8 @@ model UserRecovery {
   recoveryPercentage  Float    @default(0)            
   improvedConfidence  Float    @default(0)           
   increasedLibido     Float    @default(0)            
-  mentalClarity       Float    @default(0) 
+  mentalClarity       Float    @default(0)
+  level               Int      @default(1) 
   updatedAt           DateTime @updatedAt            
   createdAt           DateTime @default(now())      
 
@@ -238,6 +239,13 @@ model Video {
   title              String
   videoUrl           String?
   cloudinaryPublicId String?
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+}
+
+model animationImage {
+  id                 String   @id @default(uuid())
+  imageUrl           String?
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt
 }
