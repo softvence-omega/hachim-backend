@@ -16,10 +16,17 @@ export class RolesGuard implements CanActivate {
       ROLES_KEY,
       [context.getHandler(), context.getClass()],
     );
+
     if (!requiredRoles) return true;
 
     const { user } = context.switchToHttp().getRequest();
-    if (!user || !requiredRoles.includes(user.role)) {
+
+    if (!user) throw new ForbiddenException('No user found');
+
+    // Allow super admin always
+    if (user.role === 'SUPER_ADMIN') return true;
+
+    if (!requiredRoles.includes(user.role)) {
       throw new ForbiddenException('You do not have permission (role)');
     }
 

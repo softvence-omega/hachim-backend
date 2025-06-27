@@ -16,6 +16,7 @@ enum UserStatus {
 enum Role {
   USER
   ADMIN
+  SUPER_ADMIN
 }
 
 model User {
@@ -24,6 +25,7 @@ model User {
   name      String?
   age       Int?
   status    UserStatus @default(UNCOMPLETED)
+  isBlocked  Boolean  @default(false)
   email     String     @unique
   role      Role     @default(USER)
   password  String?
@@ -47,8 +49,6 @@ model User {
   sleepTrack      SleepTrack?
   motivationTrack MotivationTrack?
   Journal         Journal[]
-  subscriptions Subscription[]
-
   payment    Payment[]
 }
 
@@ -211,7 +211,8 @@ model UserRecovery {
   recoveryPercentage  Float    @default(0)            
   improvedConfidence  Float    @default(0)           
   increasedLibido     Float    @default(0)            
-  mentalClarity       Float    @default(0) 
+  mentalClarity       Float    @default(0)
+  level               Int      @default(1) 
   updatedAt           DateTime @updatedAt            
   createdAt           DateTime @default(now())      
 
@@ -222,8 +223,6 @@ model UserRecovery {
 
 model Subscription {
   id           String   @id @default(uuid())
-  userId       String
-  user         User     @relation(fields: [userId], references: [id])
   amount       Float
   durationDays Int
   isActive     Boolean  @default(true)
@@ -240,6 +239,13 @@ model Video {
   title              String
   videoUrl           String?
   cloudinaryPublicId String?
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+}
+
+model animationImage {
+  id                 String   @id @default(uuid())
+  imageUrl           String?
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt
 }

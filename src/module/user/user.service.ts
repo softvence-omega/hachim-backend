@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { Role } from '@prisma/client';
@@ -59,21 +59,22 @@ export class UserService {
       latestPaymentDate: latestPayment?.createdAt ?? null,
       paymentDurationDays: latestPayment?.durationDays ?? null,
       totalPayments: user.payment.length,
+      isBlocked:user.isBlocked
     };
   });
   }
 
-  async updateUser(email: string, dto: UpdateUserDto) {
-    const result = await this.prisma.user.update({
-      where: {
-        email,
-      },
-      data: {
-        name: dto.name,
-        age: dto.age,
-      },
+  async updateUserBlockStatus(userId: string, isBlocked: boolean) {
+    const user = await this.prisma.user.findUnique({ where: { id: userId } });
+    if (!user) throw new NotFoundException('User not found');
+    if(user.role==="SUPER_ADMIN"){
+      throw new BadRequestException("Super admin can not be blocked!")
+    }
+    return this.prisma.user.update({
+      where: { id: userId },
+      data: { isBlocked },
     });
-
-    return result;
   }
+
+    
 }

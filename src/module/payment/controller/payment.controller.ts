@@ -6,7 +6,6 @@ import {
   Body,
   Req,
   Get,
-  Param,
   Headers,
   RawBodyRequest,
   Res,
@@ -14,11 +13,13 @@ import {
   Query,
 } from '@nestjs/common';
 import { Request, Response } from 'express';
-import { CreatePaymentDto } from '../dto/payment.dto';
-import Stripe from 'stripe';
+import {  CheckPaymentQueryDto, CreatePaymentDto } from '../dto/payment.dto';
 import sendResponse from 'src/module/utils/sendResponse';
 import { PaymentService } from '../services/payment.services';
 import { Public } from 'src/common/decorators/public.decorators';
+import { Roles } from 'src/common/decorators/roles.decorator';
+import { Role } from '@prisma/client';
+import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 
 @Controller('payments')
 export class PaymentController {
@@ -40,6 +41,36 @@ export class PaymentController {
       data,
     });
   }
+  
+  
+ @Public()
+@Get('/check-payment')
+@ApiTags('Payment')
+@ApiOperation({ summary: 'Check if user has completed payment' })
+@ApiQuery({
+  name: 'email',
+  required: true,
+  description: 'Email address associated with the payment',
+  example: 'user@example.com',
+})
+@ApiResponse({
+  status: 200,
+  description: 'Payment check completed successfully',
+})
+async isUserCompletedPayment(
+  @Query('email') email: string,
+  @Res() res: Response,
+  @Req() req: Request,
+) {
+  const data = await this.paymentService.checkPayment({ email });
+  return sendResponse(res, {
+    statusCode: HttpStatus.OK,
+    success: true,
+    message: 'Payment check completed successfully',
+    data,
+  });
+}
+
 
 
   @Public()
@@ -52,21 +83,15 @@ export class PaymentController {
   }
 
   
+  
 
 
   @Get()
+  @Roles(Role.ADMIN)
   async getAllPayments(
-    @Query('page') page?: string,
-    @Query('limit') limit?: string,
     @Query('amount') amount?: string,
   ) {
-    const pageNumber = page ? parseInt(page, 10) : 1;
-    const limitNumber = limit ? parseInt(limit, 10) : 10;
-
-
     return this.paymentService.getAllPayments({
-      page: pageNumber,
-      limit: limitNumber,
       amount,
     });
   }

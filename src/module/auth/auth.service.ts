@@ -18,6 +18,7 @@ import {
 } from './dto/forget-reset-password.dto';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { isSubscriptionActive } from 'src/utils/isSubscriptionActive';
+import { Role } from '@prisma/client';
 
 @Injectable()
 export class AuthService {
@@ -136,6 +137,10 @@ async socialLogin(email: string) {
       },
     });
   }
+  
+  if (user.isBlocked) {
+  throw new ForbiddenException('Your account has been blocked by admin');
+  }
 
   const tokens = await this.getTokens(user.id, user.email, user.role);
 
@@ -157,13 +162,16 @@ async signIn(dto: LoginDto) {
   if (!user) {
     throw new ForbiddenException('Invalid Credentials');
   }
+ if (user.isBlocked) {
+  throw new ForbiddenException('Your account has been blocked!');
+   }
 
   const passwordMatches = await bcrypt.compare(dto.password, user.password!);
   if (!passwordMatches) {
     throw new ForbiddenException('Invalid Credentials');
   }
 
-  if (user.role !== 'ADMIN') {
+  if (user.role !== Role.ADMIN && user.role !== Role.SUPER_ADMIN ) {
     const payments = await this.prisma.payment.findMany({
       where: { email: dto.email },
       orderBy: { createdAt: 'desc' },

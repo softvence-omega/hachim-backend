@@ -15,8 +15,8 @@ export class SubscriptionController {
 
   @Post()
   @Roles(Role.ADMIN)
-  create(@Body() dto: CreateSubscriptionDto, @Req() req) {
-    return this.subscriptionService.create(dto,req.user.sub);
+  create(@Body() dto: CreateSubscriptionDto) {
+    return this.subscriptionService.create(dto);
   }
 
   @Patch(':id')
@@ -26,29 +26,38 @@ export class SubscriptionController {
   }
 
   @Public()
-  @Get('active/')
-  getAllActive(@Req() req) {
-     const userId = req.user.sub
-    return this.subscriptionService.getAllActive(userId);
+  @Get('active')
+  getAllActive() {
+    return this.subscriptionService.getAllActive();
   }
 
-  @Get('user/')
-  getAll(@Req() req) {
-    const userId = req.user.sub
-    return this.subscriptionService.getAll(userId);
-  }
+
 
   @Get('all')
   @Roles(Role.ADMIN)
   async getAllActiveInActive(@Res() res:Response) {
     const data=await this.subscriptionService.getAllActiveInActive();
      return sendResponse(res, {
-      statusCode: HttpStatus.CREATED,
+      statusCode: HttpStatus.OK,
       success: true,
-      message: 'Admin created successfully',
+      message: 'All subscription fetch successfully',
       data,
     });
   }
+
+  @Public()
+  @Get(':id')
+  async getSingle(@Param('id') id: string,@Res() res:Response) {
+    const data=await this.subscriptionService.getSingleSubscription(id);
+    return sendResponse(res, {
+      statusCode: HttpStatus.CREATED,
+      success: true,
+      message: 'single subscription fetch successfully',
+      data,
+    });
+  }
+
+
 
   @Delete(':id')
   @Roles(Role.ADMIN)

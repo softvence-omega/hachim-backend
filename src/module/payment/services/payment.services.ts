@@ -11,8 +11,9 @@ import {
 import Stripe from 'stripe';
 
 import { Request } from 'express';
-import { CreatePaymentDto } from '../dto/payment.dto';
+import {  CheckPaymentQueryDto, CreatePaymentDto } from '../dto/payment.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { isSubscriptionActive } from 'src/utils/isSubscriptionActive';
 
 @Injectable()
 export class PaymentService {
@@ -129,49 +130,92 @@ export class PaymentService {
   }
 
 
- async getAllPayments(query: { page?: number; limit?: number; amount?: string }) {
-  const { page = 1, limit = 10, amount } = query;
+//  async getAllPayments(query: { page?: number; limit?: number; amount?: string }) {
+//   const { page = 1, limit = 10, amount } = query;
 
-  const skip = (page - 1) * limit;
-  const take = limit;
+//   const skip = (page - 1) * limit;
+//   const take = limit;
+
+//   const whereClause = amount
+//     ? {
+//         amount: {
+//           equals: parseFloat(amount), 
+//         },
+//       }
+//     : {};
+
+//   const [payments, total] = await this.prisma.$transaction([
+//     this.prisma.payment.findMany({
+//       where: whereClause,
+//       include: {
+//         user: true,
+//       },
+//       skip,
+//       take,
+//       orderBy: {
+//         createdAt: 'desc',
+//       },
+//     }),
+//     this.prisma.payment.count({ where: whereClause }),
+//   ]);
+
+//   return {
+//     statusCode: 200,
+//     success: true,
+//     message: 'Payments fetched successfully',
+//     meta: {
+//       total,
+//       page,
+//       limit,
+//       totalPages: Math.ceil(total / limit),
+//     },
+//     data: payments,
+//   };
+// }
+
+
+async checkPayment(data:{email: string}) {
+ 
+   let subscription = false
+  const isPayment = await this.prisma.payment.findFirst({
+      where: {email:data.email,subscription:true },
+    })
+
+    if(isPayment){
+      console.log('isPayment', isPayment);
+      subscription = true
+      subscription = isSubscriptionActive(isPayment?.createdAt!, isPayment?.durationDays!);
+    }
+   return { subscription };
+}
+
+async getAllPayments(query: { amount?: string }) {
+  const { amount } = query;
 
   const whereClause = amount
     ? {
         amount: {
-          equals: parseFloat(amount), 
+          equals: parseFloat(amount),
         },
       }
     : {};
 
-  const [payments, total] = await this.prisma.$transaction([
-    this.prisma.payment.findMany({
-      where: whereClause,
-      include: {
-        user: true,
-      },
-      skip,
-      take,
-      orderBy: {
-        createdAt: 'desc',
-      },
-    }),
-    this.prisma.payment.count({ where: whereClause }),
-  ]);
+  const payments = await this.prisma.payment.findMany({
+    where: whereClause,
+    include: { user: true },
+    orderBy: { createdAt: 'desc' },
+  });
+
+  const total = await this.prisma.payment.count({ where: whereClause });
 
   return {
     statusCode: 200,
     success: true,
     message: 'Payments fetched successfully',
-    meta: {
-      total,
-      page,
-      limit,
-      totalPages: Math.ceil(total / limit),
-    },
+    total,
     data: payments,
   };
 }
-
 
 
 }

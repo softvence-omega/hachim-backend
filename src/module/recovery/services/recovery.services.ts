@@ -7,7 +7,7 @@ export class RecoveryService {
   constructor(private readonly prisma: PrismaService) {}
 
   async updateRecovery(userId: string, dto: UpdateRecoveryDto) {
-    console.log('======================hite===================')
+   
     let current = await this.prisma.userRecovery.findUnique({
       where: { userId },
     });
@@ -29,7 +29,7 @@ export class RecoveryService {
     const sleep = dto.sleepScore ?? current.sleepScore;
     const mood = dto.moodScore ?? current.moodScore;
 
-    const streakPart = (streak / 99) * 90;
+    const streakPart = (streak / 90) * 90;
     const sleepPart = (sleep / 100) * 5;
     const moodPart = (mood / 100) * 5;
 
@@ -53,6 +53,20 @@ export class RecoveryService {
         ? Math.min(100, ((streak - 30) / 15) * ((sleep + mood) / 2))
         : 0;
 
+    // Determine the level based on recovery percentage
+    let level = 1;
+    if (recoveryPercentage >= 90) {
+      level = 6;
+    } else if (recoveryPercentage >= 75) {
+      level = 5;
+    } else if (recoveryPercentage >= 60) {
+      level = 4;
+    } else if (recoveryPercentage >= 45) {
+      level = 3;
+    } else if (recoveryPercentage >= 30) {
+      level = 2;
+    }
+
     const updated = await this.prisma.userRecovery.update({
       where: { userId },
       data: {
@@ -63,6 +77,7 @@ export class RecoveryService {
         improvedConfidence: parseFloat(improvedConfidence.toFixed(2)),
         mentalClarity: parseFloat(mentalClarity.toFixed(2)),
         increasedLibido: parseFloat(increasedLibido.toFixed(2)),
+        level,
       },
     });
 
