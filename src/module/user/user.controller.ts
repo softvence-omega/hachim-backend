@@ -45,7 +45,7 @@ export class UserController {
     });
   }
 
-   @Roles(Role.SUPER_ADMIN)
+   @Roles(Role.SUPER_ADMIN,Role.ADMIN)
   @Patch('block/:id')
   async updateUserBlockStatus(
     @Param('id') id: string,
