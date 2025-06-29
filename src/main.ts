@@ -5,6 +5,7 @@ import { JwtGuard } from './common/guards/jwt.guard';
 import { RolesGuard } from './common/guards/roles.guard';
 import { PrismaService } from './prisma/prisma.service';
 import { setupSwagger } from './swagger/swagger.setup';
+import { GlobalExceptionFilter } from './common/filters/global-exception.filter';
 
 
 async function bootstrap() {
@@ -35,6 +36,8 @@ async function bootstrap() {
       skipUndefinedProperties: true,
     }),
   );
+
+  app.useGlobalFilters(new GlobalExceptionFilter());
  setupSwagger(app);
   await app.listen(process.env.PORT ?? 3000);
 }
