@@ -35,7 +35,7 @@ export class RelapseController {
     );
     const cappedStreakDays = Math.min(Math.abs(timeDifferentInDays), 90);
 
-    await this.recovery.updateRecovery(req.user.sub, {
+   const recovery = await this.recovery.updateRecovery(req.user.sub, {
       streakDays: cappedStreakDays,
     });
 
@@ -43,7 +43,7 @@ export class RelapseController {
       statusCode: HttpStatus.CREATED,
       success: true,
       message: 'Relapse record created successfully',
-      data,
+      data:{...data, level: recovery.level},
     });
   }
 

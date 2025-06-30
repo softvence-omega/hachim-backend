@@ -72,13 +72,15 @@ async getCommentsByPost(
 }
 
   @Get()
-  async getAllComments( @Res() res: Response) {
+  async getAllComments( @Res() res: Response, @Req() req) {
+
+    const currentUserId = req.user.sub;
   
-    const data = await this.commentService.getAllComments();
+    const data = await this.commentService.getAllComments(currentUserId);
 
     return sendResponse(res, {
       statusCode: HttpStatus.OK,
-      success: true,
+      success: true,  
       message: 'Comments retrieved successfully',
       data,
     });
