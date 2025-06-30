@@ -30,21 +30,67 @@ export class CommentService {
     });
   }
 
-  async getAllComments() {
-    return prisma.comment.findMany({
+  // async getAllComments() {
+  //   return prisma.comment.findMany({
       
-      orderBy: {
-        createdAt: 'desc',
-      },
-      include: {
-        user: { select: { id: true, userName: true } },
-        reply: {
-          include: { user: { select: { userName: true } } },
+  //     orderBy: {
+  //       createdAt: 'desc',
+  //     },
+  //     include: {
+  //       user: { select: { id: true, userName: true } },
+  //       reply: {
+  //         include: { user: { select: { userName: true } } },
+  //       },
+  //       _count: {
+  //         select: { likes: true },
+  //       },
+  //     },
+  //   });
+  // }
+
+
+  async getAllComments(currentUserId: string) {
+  const comments = await prisma.comment.findMany({
+    orderBy: {
+      createdAt: 'desc',
+    },
+    include: {
+      user: {
+        select: {
+          id: true,
+          userName: true,
         },
-        _count: {
-          select: { likes: true },
+      },
+      reply: {
+        include: {
+          user: {
+            select: {
+              userName: true,
+            },
+          },
         },
       },
-    });
-  }
+      _count: {
+        select: {
+          likes: true,
+        },
+      },
+      likes: {
+        where: {
+          userId: currentUserId,
+        },
+        select: {
+          id: true,
+        },
+      },
+    },
+  });
+
+  return comments.map(comment => ({
+    ...comment,
+    isLiked: comment.likes.length > 0,
+    
+  }));
+}
+
 }
