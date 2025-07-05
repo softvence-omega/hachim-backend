@@ -21,9 +21,15 @@ export class RelapseService {
         userId,
       },
     });
+    
 
+
+    
+
+
+    
     const timeDifferent =
-      relapse.createdAt.getTime() - new Date(startDate).getTime();
+       new Date(startDate).getTime() - relapse.createdAt.getTime()
 
     return {
       timeDifferent,
@@ -50,6 +56,7 @@ export class RelapseService {
     improvedConfidence: 0,
     increasedLibido: 0,
     mentalClarity: 0,
+    level: 0,
    
     
   },
