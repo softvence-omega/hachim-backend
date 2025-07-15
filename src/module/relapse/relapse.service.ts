@@ -31,6 +31,19 @@ export class RelapseService {
     const timeDifferent =
        new Date(startDate).getTime() - relapse.createdAt.getTime()
 
+
+
+      await this.prisma.relapse.update({
+        where: { userId },
+        data: {
+          spendDate:timeDifferent,
+        },
+      });
+      ;
+
+
+
+
     return {
       timeDifferent,
       relapse,
@@ -57,6 +70,9 @@ export class RelapseService {
     increasedLibido: 0,
     mentalClarity: 0,
     level: 0,
+    
+    
+    
    
     
   },
@@ -71,9 +87,10 @@ export class RelapseService {
         urg: null,
         Triggers: null,
         note: null,
-        spendDate: null,
+        spendDate: 0,
         level: null,
          createdAt: new Date(),
+        
         
       },
     });

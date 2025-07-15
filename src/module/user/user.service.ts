@@ -64,6 +64,23 @@ export class UserService {
   });
   }
 
+  async leaderboard() {
+  const users = await this.prisma.user.findMany({
+    include: {
+      relapse: true,
+    },
+  });
+
+  // Sort by relapse.spendDate (null-safe, descending)
+  const sortedUsers = users.sort((a, b) => {
+    const aSpend = a.relapse?.spendDate ?? -Infinity;
+    const bSpend = b.relapse?.spendDate ?? -Infinity;
+    return bSpend - aSpend; // larger spendDate first
+  });
+
+  return sortedUsers;
+}
+
   async updateUserBlockStatus(userId: string, isBlocked: boolean) {
     const user = await this.prisma.user.findUnique({ where: { id: userId } });
     if (!user) throw new NotFoundException('User not found');
