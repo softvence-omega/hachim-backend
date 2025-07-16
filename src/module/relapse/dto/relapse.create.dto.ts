@@ -52,7 +52,7 @@ export class CreateRelapseDto {
   })
   @IsOptional()
   @IsDateString({}, { message: 'spendDate must be a valid ISO8601 date string' })
-  spendDate?: string;
+  spendDate?: number;
 
   @ApiPropertyOptional({
     example: 2,
