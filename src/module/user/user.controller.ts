@@ -16,6 +16,7 @@ import { Roles } from 'src/common/decorators/roles.decorator';
 import { Role } from '@prisma/client';
 import { CreateAdminDto } from './dto/create-admin.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { Public } from 'src/common/decorators/public.decorators';
 
 @Controller('user')
 export class UserController {
@@ -37,6 +38,19 @@ export class UserController {
   @Roles(Role.ADMIN)
   async getAllUser(@Res() res: Response) {
     const data = await this.userService.getAllUser();
+    return sendResponse(res, {
+      statusCode: HttpStatus.OK,
+      success: true,
+      message: 'Retrive all users successfully',
+      data,
+    });
+  }
+
+  @Public()
+  @Get('leaderboard')
+  @Roles()
+  async leaderboard(@Res() res: Response) {
+    const data = await this.userService.leaderboard();
     return sendResponse(res, {
       statusCode: HttpStatus.OK,
       success: true,

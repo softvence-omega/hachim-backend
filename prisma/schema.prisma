@@ -160,7 +160,7 @@ model Relapse {
   urg        Int?    
   Triggers   String?  
   note       String?  
-  spendDate  DateTime? 
+  spendDate   Int? 
   level      Int?     
   isDeleted  Boolean  
   createdAt  DateTime @default(now())
