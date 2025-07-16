@@ -36,7 +36,7 @@ export class RelapseService {
       await this.prisma.relapse.update({
         where: { userId },
         data: {
-          spendDate:timeDifferent,
+          spendDate:timeDifferent ?? 0,
         },
       });
       ;
