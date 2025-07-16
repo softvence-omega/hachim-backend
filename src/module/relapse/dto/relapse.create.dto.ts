@@ -50,8 +50,9 @@ export class CreateRelapseDto {
     example: '2025-06-25T10:00:00Z',
     description: 'Date when the relapse happened (ISO 8601 format)',
   })
-  @IsOptional()
-  @IsDateString({}, { message: 'spendDate must be a valid ISO8601 date string' })
+ 
+    @IsOptional()
+  @IsInt({ message: 'Level must be an integer' })
   spendDate?: number;
 
   @ApiPropertyOptional({
