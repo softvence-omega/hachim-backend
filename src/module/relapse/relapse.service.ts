@@ -14,12 +14,12 @@ export class RelapseService {
       where: { userId },
       update: {
         ...dto,
-      
+        spendDate:0,
         updatedAt: new Date(),
       },
       create: {
         ...dto,
-        
+        spendDate:0,
         isDeleted: false,
         userId,
       },
@@ -31,25 +31,25 @@ export class RelapseService {
 
 
     
-    // const timeDifferent =
-    //    new Date(startDate).getTime() - relapse.createdAt.getTime()
+    const timeDifferent =
+       new Date(startDate).getTime() - relapse.createdAt.getTime()
 
 
 
-    //   await this.prisma.relapse.update({
-    //     where: { userId },
-    //     data: {
-    //       spendDate:timeDifferent ?? 0,
-    //     },
-    //   });
-    //   ;
+      await this.prisma.relapse.update({
+        where: { userId },
+        data: {
+          spendDate: 0,
+        },
+      });
+      ;
 
 
 
 
     return {
-      // timeDifferent,
-      // relapse,
+      timeDifferent,
+      relapse,
     };
   }
 
