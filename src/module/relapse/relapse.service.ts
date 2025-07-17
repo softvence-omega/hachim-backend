@@ -14,12 +14,10 @@ export class RelapseService {
       where: { userId },
       update: {
         ...dto,
-        spendDate:0,
         updatedAt: new Date(),
       },
       create: {
         ...dto,
-        spendDate:0,
         isDeleted: false,
         userId,
       },
@@ -31,8 +29,8 @@ export class RelapseService {
 
 
     
-    const timeDifferent =
-       new Date(startDate).getTime() - relapse.createdAt.getTime()
+  const timeDifferent = Math.abs(new Date(startDate).getTime() - relapse.createdAt.getTime());
+
 
 
 
