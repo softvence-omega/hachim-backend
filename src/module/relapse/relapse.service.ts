@@ -7,6 +7,7 @@ export class RelapseService {
   constructor(private prisma: PrismaService) {}
 
   async createOrUpdateRelapse(newdto: CreateRelapseDto, userId: string) {
+      console.log(newdto)
     const { startDate, ...dto } = newdto;
 
     const relapse = await this.prisma.relapse.upsert({
@@ -28,15 +29,15 @@ export class RelapseService {
 
 
     
-    const timeDifferent =
-       new Date(startDate).getTime() - relapse.createdAt.getTime()
+  const timeDifferent = Math.abs(new Date(startDate).getTime() - relapse.createdAt.getTime());
+
 
 
 
       await this.prisma.relapse.update({
         where: { userId },
         data: {
-          spendDate:timeDifferent ?? 0,
+          spendDate: 0,
         },
       });
       ;

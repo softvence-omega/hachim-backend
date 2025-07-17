@@ -51,9 +51,6 @@ export class CreateRelapseDto {
     description: 'Date when the relapse happened (ISO 8601 format)',
   })
  
-    @IsOptional()
-  @IsInt({ message: 'Level must be an integer' })
-  spendDate?: number;
 
   @ApiPropertyOptional({
     example: 2,
