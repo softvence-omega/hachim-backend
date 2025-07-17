@@ -30,20 +30,20 @@ export class RelapseController {
       dto,
       req.user.sub,
     );
-    const timeDifferentInDays: number = Math.floor(
-      data.timeDifferent / (1000 * 60 * 60 * 24),
-    );
-    const cappedStreakDays = Math.min(Math.abs(timeDifferentInDays), 90);
+    // const timeDifferentInDays: number = Math.floor(
+    //   data.timeDifferent / (1000 * 60 * 60 * 24),
+    // );
+    // const cappedStreakDays = Math.min(Math.abs(timeDifferentInDays), 90);
 
-   const recovery = await this.recovery.updateRecovery(req.user.sub, {
-      streakDays: cappedStreakDays,
-    });
+  //  const recovery = await this.recovery.updateRecovery(req.user.sub, {
+  //     streakDays: cappedStreakDays,
+  //   });
 
     return sendResponse(res, {
       statusCode: HttpStatus.CREATED,
       success: true,
       message: 'Relapse record created successfully',
-      data:{...data, level: recovery.level},
+      // data:{...data, level: recovery.level},
     });
   }
 

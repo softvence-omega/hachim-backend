@@ -7,16 +7,19 @@ export class RelapseService {
   constructor(private prisma: PrismaService) {}
 
   async createOrUpdateRelapse(newdto: CreateRelapseDto, userId: string) {
+      console.log(newdto)
     const { startDate, ...dto } = newdto;
 
     const relapse = await this.prisma.relapse.upsert({
       where: { userId },
       update: {
         ...dto,
+      
         updatedAt: new Date(),
       },
       create: {
         ...dto,
+        
         isDeleted: false,
         userId,
       },
@@ -28,25 +31,25 @@ export class RelapseService {
 
 
     
-    const timeDifferent =
-       new Date(startDate).getTime() - relapse.createdAt.getTime()
+    // const timeDifferent =
+    //    new Date(startDate).getTime() - relapse.createdAt.getTime()
 
 
 
-      await this.prisma.relapse.update({
-        where: { userId },
-        data: {
-          spendDate:timeDifferent ?? 0,
-        },
-      });
-      ;
+    //   await this.prisma.relapse.update({
+    //     where: { userId },
+    //     data: {
+    //       spendDate:timeDifferent ?? 0,
+    //     },
+    //   });
+    //   ;
 
 
 
 
     return {
-      timeDifferent,
-      relapse,
+      // timeDifferent,
+      // relapse,
     };
   }
 
